@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>리밸런싱 제안 — 우리 가계</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
+<style>
+  :root {
+    --bg: #000000;
+    --bg-elev: #18191C;
+    --bg-elev-2: #212226;
+    --bg-chip: #2A2B2F;
+    --text: #FFFFFF;
+    --text-2: #D4D6DA;
+    --text-3: #8B8E95;
+    --text-4: #5C5F66;
+    --border: #2B2D31;
+    --border-soft: #1F2024;
+    --up: #EB4D3D;
+    --up-soft: rgba(235, 77, 61, 0.14);
+    --up-bg: rgba(235, 77, 61, 0.08);
+    --down: #3182F6;
+    --down-soft: rgba(49, 130, 246, 0.14);
+    --down-bg: rgba(49, 130, 246, 0.08);
+    --accent: #3182F6;
+    --ai: #A487F0;
+    --ai-soft: rgba(164, 135, 240, 0.14);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
+  button { font-family: inherit; border: none; background: none; color: inherit; cursor: pointer; }
+
+  html, body {
+    background: #0B0C0E;
+    font-family: 'Pretendard', -apple-system, sans-serif;
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    background: radial-gradient(ellipse at top, #1A1C20 0%, #050507 100%);
+  }
+
+  .device {
+    width: 100%;
+    max-width: 420px;
+    background: var(--bg);
+    border-radius: 44px;
+    overflow: hidden;
+    box-shadow: 0 0 0 1px rgba(255,255,255,0.04), 0 40px 80px rgba(0,0,0,0.6);
+    position: relative;
+    border: 6px solid #1A1B1E;
+    height: 900px;
+  }
+
+  .app {
+    position: relative;
+    padding-bottom: 110px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    height: 100%;
+  }
+  .app::-webkit-scrollbar { display: none; }
+  .app { scrollbar-width: none; }
+
+  /* ── Status ── */
+  .status {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 26px 10px;
+    font-size: 15px;
+    font-weight: 600;
+  }
+  .signal-bars { display: flex; align-items: flex-end; gap: 2px; height: 11px; }
+  .signal-bars span { width: 3px; background: var(--text); border-radius: 0.5px; }
+  .signal-bars span:nth-child(1) { height: 3px; }
+  .signal-bars span:nth-child(2) { height: 5px; }
+  .signal-bars span:nth-child(3) { height: 8px; }
+  .signal-bars span:nth-child(4) { height: 11px; }
+  .battery { width: 26px; height: 12px; border: 1px solid rgba(255,255,255,0.5); border-radius: 3px; position: relative; padding: 1px; }
+  .battery::after { content: ''; position: absolute; right: -3px; top: 3px; width: 2px; height: 4px; background: rgba(255,255,255,0.5); border-radius: 0 2px 2px 0; }
+  .battery-fill { height: 100%; width: 72%; background: var(--text); border-radius: 1px; }
+  .status-right { display: flex; gap: 6px; align-items: center; }
+
+  /* ── Top nav ── */
+  .topnav {
+    display: grid;
+    grid-template-columns: 44px 1fr 44px;
+    align-items: center;
+    padding: 8px 14px 4px;
+  }
+  .nav-btn {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text);
+    border-radius: 50%;
+  }
+  .nav-btn:hover { background: var(--bg-elev); }
+  .nav-btn svg { width: 22px; height: 22px; stroke: currentColor; stroke-width: 2; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+  .nav-title {
+    text-align: center;
+    font-size: 17px;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+  }
+
+  /* ── Hero ── */
+  .hero {
+    margin: 14px 14px 10px;
+    background: linear-gradient(135deg, #1E1A2E 0%, #18191C 55%, #1E1D23 100%);
+    border: 1px solid rgba(164, 135, 240, 0.2);
+    border-radius: 22px;
+    padding: 22px 22px 20px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -60px;
+    right: -40px;
+    width: 180px;
+    height: 180px;
+    background: radial-gradient(circle, rgba(164, 135, 240, 0.35) 0%, transparent 65%);
+    pointer-events: none;
+  }
+  .hero-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+    position: relative;
+  }
+  .ai-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 9px;
+    background: var(--ai-soft);
+    color: var(--ai);
+    border-radius: 100px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+  }
+  .ai-badge .sparkle {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    background: var(--ai);
+    clip-path: polygon(50% 0%, 61% 39%, 100% 50%, 61% 61%, 50% 100%, 39% 61%, 0% 50%, 39% 39%);
+  }
+  .hero-timestamp {
+    font-size: 12px;
+    color: var(--text-3);
+    font-weight: 500;
+    letter-spacing: -0.01em;
+  }
+
+  .hero-title {
+    font-size: 26px;
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    line-height: 1.2;
+    margin-bottom: 10px;
+    position: relative;
+  }
+  .hero-desc {
+    font-size: 14px;
+    color: var(--text-2);
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    line-height: 1.55;
+    position: relative;
+    margin-bottom: 18px;
+  }
+  .hero-desc .emph-up { color: var(--up); font-weight: 700; }
+  .hero-desc .emph-down { color: var(--down); font-weight: 700; }
+
+  .drift-meter {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px;
+    background: rgba(255,255,255,0.04);
+    border-radius: 14px;
+    position: relative;
+  }
+  .drift-label {
+    font-size: 12px;
+    color: var(--text-3);
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    margin-bottom: 2px;
+  }
+  .drift-value {
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    font-variant-numeric: tabular-nums;
+  }
+  .drift-value .score-denom {
+    font-size: 14px;
+    color: var(--text-3);
+    font-weight: 600;
+  }
+  .drift-bar {
+    position: relative;
+    width: 120px;
+    height: 6px;
+    background: var(--bg-chip);
+    border-radius: 100px;
+    overflow: hidden;
+  }
+  .drift-bar-fill {
+    height: 100%;
+    width: 74%;
+    background: linear-gradient(90deg, #6B9BFF 0%, #A487F0 50%, #EB4D3D 100%);
+    border-radius: 100px;
+  }
+
+  /* ── Section label ── */
+  .sec-label {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-2);
+    letter-spacing: -0.03em;
+    padding: 22px 22px 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .sec-label-meta {
+    font-size: 12px;
+    color: var(--text-3);
+    font-weight: 500;
+  }
+
+  /* ── Card ── */
+  .card {
+    margin: 0 14px 10px;
+    background: var(--bg-elev);
+    border-radius: 22px;
+    padding: 20px 22px;
+  }
+
+  /* ── Drift comparison rows ── */
+  .drift-row {
+    padding: 14px 0;
+  }
+  .drift-row + .drift-row { border-top: 1px solid var(--border-soft); }
+  .drift-row-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+  .drift-cat {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .drift-emoji {
+    width: 32px;
+    height: 32px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+  }
+  .drift-emoji.real { background: #1E3A2C; }
+  .drift-emoji.stock { background: #3A1E1E; }
+  .drift-emoji.cash { background: #1E2B3A; }
+  .drift-emoji.pension { background: #2D1E3A; }
+  .drift-name {
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+  }
+  .drift-diff {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    padding: 4px 9px;
+    border-radius: 100px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
+  }
+  .drift-diff.over { background: var(--up-soft); color: var(--up); }
+  .drift-diff.under { background: var(--down-soft); color: var(--down); }
+  .drift-diff.ok { background: var(--bg-chip); color: var(--text-3); }
+
+  .drift-track {
+    position: relative;
+    height: 10px;
+    background: var(--bg-chip);
+    border-radius: 100px;
+    overflow: visible;
+  }
+  .drift-fill {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    border-radius: 100px;
+  }
+  .drift-fill.over { background: var(--up); }
+  .drift-fill.under { background: var(--down); }
+  .drift-fill.ok { background: var(--text-3); }
+  .drift-target {
+    position: absolute;
+    top: -3px;
+    width: 2px;
+    height: 16px;
+    background: var(--text);
+    border-radius: 100px;
+    z-index: 2;
+  }
+  .drift-target::after {
+    content: '목표';
+    position: absolute;
+    top: 18px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 9px;
+    color: var(--text-3);
+    font-weight: 600;
+    white-space: nowrap;
+    letter-spacing: -0.02em;
+  }
+  .drift-footer {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 6px;
+    font-size: 11px;
+    color: var(--text-3);
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.02em;
+  }
+  .drift-current {
+    font-size: 14px;
+    font-weight: 800;
+    color: var(--text);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.02em;
+  }
+
+  /* ── Action items ── */
+  .action-card {
+    padding: 4px 0;
+  }
+  .action-item {
+    display: grid;
+    grid-template-columns: 36px 1fr auto;
+    gap: 14px;
+    padding: 14px 22px;
+    align-items: center;
+  }
+  .action-item + .action-item { border-top: 1px solid var(--border-soft); }
+  .action-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 11px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    font-weight: 700;
+  }
+  .action-icon.sell { background: var(--down-bg); color: var(--down); }
+  .action-icon.buy { background: var(--up-bg); color: var(--up); }
+  .action-icon.transfer { background: rgba(164,135,240,0.1); color: var(--ai); }
+
+  .action-body { min-width: 0; }
+  .action-head {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin-bottom: 3px;
+  }
+  .action-type {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+  }
+  .action-type.sell { color: var(--down); }
+  .action-type.buy { color: var(--up); }
+  .action-type.transfer { color: var(--ai); }
+  .action-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: -0.03em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .action-sub {
+    font-size: 12px;
+    color: var(--text-3);
+    font-weight: 500;
+    letter-spacing: -0.02em;
+  }
+  .action-amount {
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    color: var(--text);
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+  }
+  .action-amount-sub {
+    font-size: 11px;
+    color: var(--text-3);
+    font-weight: 500;
+    margin-top: 2px;
+  }
+
+  /* ── Reasoning card ── */
+  .reason-card {
+    padding: 18px 22px 20px;
+    background: var(--bg-elev);
+    margin: 0 14px 10px;
+    border-radius: 22px;
+    position: relative;
+  }
+  .reason-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  .reason-icon {
+    width: 24px;
+    height: 24px;
+    border-radius: 8px;
+    background: var(--ai-soft);
+    color: var(--ai);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 800;
+  }
+  .reason-title {
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+  }
+  .reason-body {
+    font-size: 13px;
+    color: var(--text-2);
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    line-height: 1.6;
+  }
+  .reason-body .hl { color: var(--text); font-weight: 600; }
+  .reason-meta {
+    margin-top: 14px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .meta-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 10px;
+    background: var(--bg-chip);
+    border-radius: 100px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-2);
+    letter-spacing: -0.02em;
+  }
+  .meta-chip .chip-label { color: var(--text-4); font-weight: 500; }
+
+  /* ── Market card ── */
+  .market-card {
+    margin: 0 14px 10px;
+    background: var(--bg-elev);
+    border-radius: 22px;
+    padding: 18px 22px;
+  }
+  .market-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px 24px;
+    margin-top: 14px;
+  }
+  .market-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+  }
+  .market-name {
+    font-size: 13px;
+    color: var(--text-3);
+    font-weight: 500;
+    letter-spacing: -0.02em;
+  }
+  .market-num {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 2px;
+  }
+  .market-val {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.02em;
+  }
+  .market-chg {
+    font-size: 11px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+  .market-chg.up { color: var(--up); }
+  .market-chg.down { color: var(--down); }
+
+  /* ── Footer actions ── */
+  .footer-pad { height: 8px; }
+
+  .footer-bar {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    background: rgba(10, 11, 14, 0.92);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-top: 1px solid var(--border);
+    padding: 12px 14px 26px;
+    z-index: 50;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 10px;
+  }
+  .btn-secondary {
+    padding: 14px 16px;
+    background: var(--bg-elev-2);
+    color: var(--text-2);
+    border-radius: 14px;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    transition: background 0.15s;
+  }
+  .btn-secondary:hover { background: var(--bg-chip); }
+
+  .btn-primary {
+    padding: 14px 16px;
+    background: var(--accent);
+    color: #FFFFFF;
+    border-radius: 14px;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: background 0.15s;
+    box-shadow: 0 4px 16px rgba(49,130,246,0.3);
+  }
+  .btn-primary:hover { background: #2973DC; }
+  .btn-primary .sub {
+    font-size: 12px;
+    font-weight: 500;
+    opacity: 0.7;
+  }
+
+  /* ── Impact preview ── */
+  .impact-card {
+    margin: 0 14px 10px;
+    background: var(--bg-elev);
+    border-radius: 22px;
+    padding: 18px 22px 20px;
+  }
+  .impact-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+  .impact-title {
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+  }
+  .impact-tag {
+    font-size: 11px;
+    color: var(--text-3);
+    font-weight: 600;
+  }
+  .impact-grid {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 12px;
+    align-items: center;
+  }
+  .impact-col {
+    background: var(--bg-chip);
+    padding: 12px;
+    border-radius: 12px;
+    text-align: center;
+  }
+  .impact-col.after {
+    background: rgba(49, 130, 246, 0.1);
+    border: 1px solid rgba(49, 130, 246, 0.3);
+  }
+  .impact-col-label {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--text-3);
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .impact-col.after .impact-col-label { color: var(--accent); }
+  .impact-col-value {
+    font-size: 16px;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    font-variant-numeric: tabular-nums;
+  }
+  .impact-col-sub {
+    font-size: 10px;
+    color: var(--text-3);
+    font-weight: 500;
+    margin-top: 4px;
+    letter-spacing: -0.01em;
+  }
+  .impact-arrow {
+    color: var(--text-3);
+    font-size: 16px;
+  }
+</style>
+</head>
+<body>
+  <div class="device">
+    <div class="app">
+
+      <!-- Status -->
+      <div class="status">
+        <span>9:41</span>
+        <div class="status-right">
+          <div class="signal-bars"><span></span><span></span><span></span><span></span></div>
+          <div class="battery"><div class="battery-fill"></div></div>
+        </div>
+      </div>
+
+      <!-- Top nav -->
+      <div class="topnav">
+        <button class="nav-btn">
+          <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <div class="nav-title">리밸런싱 제안</div>
+        <button class="nav-btn">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+        </button>
+      </div>
+
+      <!-- Hero -->
+      <div class="hero">
+        <div class="hero-head">
+          <div class="ai-badge"><span class="sparkle"></span> AI 분석</div>
+          <div class="hero-timestamp">· 방금 전 업데이트</div>
+        </div>
+
+        <div class="hero-title">자산 편차가 커졌어요</div>
+        <div class="hero-desc">
+          주식 비중이 목표보다 <span class="emph-up">+8.3%p</span>,<br>
+          현금은 <span class="emph-down">−5.2%p</span> 부족한 상태예요.
+        </div>
+
+        <div class="drift-meter">
+          <div>
+            <div class="drift-label">재조정 필요도</div>
+            <div class="drift-value">7.4<span class="score-denom">/10</span></div>
+          </div>
+          <div class="drift-bar">
+            <div class="drift-bar-fill"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Drift comparison -->
+      <div class="sec-label">
+        포트폴리오 편차
+        <span class="sec-label-meta">현재 · 목표</span>
+      </div>
+
+      <div class="card" style="padding: 4px 22px;">
+
+        <div class="drift-row">
+          <div class="drift-row-head">
+            <div class="drift-cat">
+              <div class="drift-emoji stock">📈</div>
+              <div class="drift-name">주식 · 펀드</div>
+            </div>
+            <div class="drift-diff over">▲ +8.3%p</div>
+          </div>
+          <div class="drift-track">
+            <div class="drift-fill over" style="width: 38.6%;"></div>
+            <div class="drift-target" style="left: 30.3%;"></div>
+          </div>
+          <div class="drift-footer">
+            <span>현재 <span class="drift-current">38.6%</span></span>
+            <span>목표 30.3%</span>
+          </div>
+        </div>
+
+        <div class="drift-row">
+          <div class="drift-row-head">
+            <div class="drift-cat">
+              <div class="drift-emoji cash">💰</div>
+              <div class="drift-name">현금 · 예금</div>
+            </div>
+            <div class="drift-diff under">▼ −5.2%p</div>
+          </div>
+          <div class="drift-track">
+            <div class="drift-fill under" style="width: 14.8%;"></div>
+            <div class="drift-target" style="left: 20.0%;"></div>
+          </div>
+          <div class="drift-footer">
+            <span>현재 <span class="drift-current">14.8%</span></span>
+            <span>목표 20.0%</span>
+          </div>
+        </div>
+
+        <div class="drift-row">
+          <div class="drift-row-head">
+            <div class="drift-cat">
+              <div class="drift-emoji pension">🪙</div>
+              <div class="drift-name">연금 · 기타</div>
+            </div>
+            <div class="drift-diff under">▼ −3.1%p</div>
+          </div>
+          <div class="drift-track">
+            <div class="drift-fill under" style="width: 5.6%;"></div>
+            <div class="drift-target" style="left: 8.7%;"></div>
+          </div>
+          <div class="drift-footer">
+            <span>현재 <span class="drift-current">5.6%</span></span>
+            <span>목표 8.7%</span>
+          </div>
+        </div>
+
+        <div class="drift-row">
+          <div class="drift-row-head">
+            <div class="drift-cat">
+              <div class="drift-emoji real">🏠</div>
+              <div class="drift-name">부동산</div>
+            </div>
+            <div class="drift-diff ok">· 적정</div>
+          </div>
+          <div class="drift-track">
+            <div class="drift-fill ok" style="width: 41.0%;"></div>
+            <div class="drift-target" style="left: 41.0%;"></div>
+          </div>
+          <div class="drift-footer">
+            <span>현재 <span class="drift-current">41.0%</span></span>
+            <span>목표 41.0%</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Recommended actions -->
+      <div class="sec-label">
+        추천 조정안
+        <span class="sec-label-meta">3건 · 예상 실행시간 약 5분</span>
+      </div>
+
+      <div class="card action-card" style="padding: 0;">
+
+        <div class="action-item">
+          <div class="action-icon sell">↓</div>
+          <div class="action-body">
+            <div class="action-head">
+              <span class="action-type sell">매도</span>
+              <span class="action-title">삼성전자</span>
+            </div>
+            <div class="action-sub">국내 주식 비중 축소 · 차익 실현</div>
+          </div>
+          <div>
+            <div class="action-amount">3주</div>
+            <div class="action-amount-sub">약 215,400원</div>
+          </div>
+        </div>
+
+        <div class="action-item">
+          <div class="action-icon sell">↓</div>
+          <div class="action-body">
+            <div class="action-head">
+              <span class="action-type sell">매도</span>
+              <span class="action-title">KODEX 미국S&amp;P500</span>
+            </div>
+            <div class="action-sub">미국 주식 비중 일부 축소</div>
+          </div>
+          <div>
+            <div class="action-amount">10주</div>
+            <div class="action-amount-sub">약 187,000원</div>
+          </div>
+        </div>
+
+        <div class="action-item">
+          <div class="action-icon transfer">⇄</div>
+          <div class="action-body">
+            <div class="action-head">
+              <span class="action-type transfer">이체</span>
+              <span class="action-title">증권계좌 → 적금</span>
+            </div>
+            <div class="action-sub">현금 비중 확보 · 파킹통장 활용</div>
+          </div>
+          <div>
+            <div class="action-amount">1,800,000원</div>
+            <div class="action-amount-sub">→ KB Star</div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Impact preview -->
+      <div class="sec-label">
+        조정 후 예상
+        <span class="sec-label-meta">시뮬레이션</span>
+      </div>
+
+      <div class="impact-card">
+        <div class="impact-grid">
+          <div class="impact-col">
+            <div class="impact-col-label">현재 편차도</div>
+            <div class="impact-col-value">7.4</div>
+            <div class="impact-col-sub">높음</div>
+          </div>
+          <div class="impact-arrow">→</div>
+          <div class="impact-col after">
+            <div class="impact-col-label">조정 후</div>
+            <div class="impact-col-value">1.2</div>
+            <div class="impact-col-sub">적정 범위</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Reasoning -->
+      <div class="sec-label">AI 분석 근거</div>
+
+      <div class="reason-card">
+        <div class="reason-head">
+          <div class="reason-icon">✦</div>
+          <div class="reason-title">왜 지금 조정을 제안하는가</div>
+        </div>
+        <div class="reason-body">
+          최근 3개월 국내 주식이 <span class="hl">+12.4%</span> 상승하며 목표 비중을 넘어섰어요. 연초 이후 환율 약세(<span class="hl">1,358원</span>)와 미 연준의 금리 동결 기조를 고려할 때, 차익 실현 후 <span class="hl">현금 비중을 회복</span>하는 편이 방어적 포지션 확보에 적합합니다.
+        </div>
+
+        <div class="reason-meta">
+          <div class="meta-chip">
+            <span class="chip-label">예상 수수료</span>
+            약 5,400원
+          </div>
+          <div class="meta-chip">
+            <span class="chip-label">양도세</span>
+            해당 없음
+          </div>
+          <div class="meta-chip">
+            <span class="chip-label">마지막 조정</span>
+            76일 전
+          </div>
+        </div>
+      </div>
+
+      <!-- Market context -->
+      <div class="sec-label">시장 지표</div>
+
+      <div class="market-card">
+        <div class="market-grid">
+          <div class="market-item">
+            <span class="market-name">KOSPI</span>
+            <div class="market-num">
+              <span class="market-val">2,845.12</span>
+              <span class="market-chg up">+0.82%</span>
+            </div>
+          </div>
+          <div class="market-item">
+            <span class="market-name">S&amp;P 500</span>
+            <div class="market-num">
+              <span class="market-val">5,320.45</span>
+              <span class="market-chg up">+0.31%</span>
+            </div>
+          </div>
+          <div class="market-item">
+            <span class="market-name">USD/KRW</span>
+            <div class="market-num">
+              <span class="market-val">1,358.20</span>
+              <span class="market-chg down">−0.18%</span>
+            </div>
+          </div>
+          <div class="market-item">
+            <span class="market-name">美 기준금리</span>
+            <div class="market-num">
+              <span class="market-val">4.50%</span>
+              <span class="market-chg" style="color: var(--text-3)">동결</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer-pad"></div>
+    </div>
+
+    <!-- Bottom action bar -->
+    <div class="footer-bar">
+      <button class="btn-secondary">나중에</button>
+      <button class="btn-primary">
+        실행하기
+        <span class="sub">· 3건</span>
+      </button>
+    </div>
+  </div>
+</body>
+</html>

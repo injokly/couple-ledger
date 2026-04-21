@@ -1,0 +1,30 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pnpm *)",
+      "Bash(pnpm:*)",
+      "Bash(git status)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git branch:*)",
+      "Bash(git checkout:*)",
+      "Bash(supabase *)",
+      "Bash(supabase:*)",
+      "Read(**)",
+      "Edit(src/**)",
+      "Edit(tests/**)",
+      "Edit(docs/**)",
+      "Edit(specs/**)",
+      "Edit(supabase/migrations/**)"
+    ],
+    "deny": [
+      "Bash(rm -rf *)",
+      "Bash(npm *)",
+      "Bash(yarn *)",
+      "Edit(.env*)",
+      "Edit(.git/**)"
+    ]
+  }
+}

@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>우리 가계 — 홈</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
+<style>
+  :root {
+    --bg: #000000;
+    --bg-elev: #18191C;
+    --bg-elev-2: #212226;
+    --bg-chip: #2A2B2F;
+    --text: #FFFFFF;
+    --text-2: #D4D6DA;
+    --text-3: #8B8E95;
+    --text-4: #5C5F66;
+    --border: #2B2D31;
+    --up: #EB4D3D;
+    --up-soft: rgba(235, 77, 61, 0.15);
+    --down: #3182F6;
+    --down-soft: rgba(49, 130, 246, 0.15);
+    --accent: #3182F6;
+    --success: #1CB572;
+    --warning: #FFB020;
+    --chart: #FFFFFF;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
+
+  html, body {
+    background: #0B0C0E;
+    font-family: 'Pretendard', -apple-system, sans-serif;
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    background: radial-gradient(ellipse at top, #1A1C20 0%, #050507 100%);
+  }
+
+  .device {
+    width: 100%;
+    max-width: 420px;
+    background: var(--bg);
+    border-radius: 44px;
+    overflow: hidden;
+    box-shadow: 0 0 0 1px rgba(255,255,255,0.04), 0 40px 80px rgba(0,0,0,0.6);
+    position: relative;
+    border: 6px solid #1A1B1E;
+  }
+
+  .app {
+    position: relative;
+    padding-bottom: 100px;
+    overflow-x: hidden;
+    max-height: 920px;
+    overflow-y: auto;
+  }
+
+  /* Hide scrollbar */
+  .app::-webkit-scrollbar { display: none; }
+  .app { scrollbar-width: none; }
+
+  /* ── Status bar ── */
+  .status {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 26px 10px;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text);
+  }
+  .status .time { font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
+  .status-right { display: flex; gap: 6px; align-items: center; }
+  .signal-bars {
+    display: flex;
+    align-items: flex-end;
+    gap: 2px;
+    height: 11px;
+  }
+  .signal-bars span {
+    width: 3px;
+    background: var(--text);
+    border-radius: 0.5px;
+  }
+  .signal-bars span:nth-child(1) { height: 3px; }
+  .signal-bars span:nth-child(2) { height: 5px; }
+  .signal-bars span:nth-child(3) { height: 8px; }
+  .signal-bars span:nth-child(4) { height: 11px; }
+  .battery {
+    width: 26px;
+    height: 12px;
+    border: 1px solid rgba(255,255,255,0.5);
+    border-radius: 3px;
+    position: relative;
+    padding: 1px;
+  }
+  .battery::after {
+    content: '';
+    position: absolute;
+    right: -3px;
+    top: 3px;
+    width: 2px;
+    height: 4px;
+    background: rgba(255,255,255,0.5);
+    border-radius: 0 2px 2px 0;
+  }
+  .battery-fill {
+    height: 100%;
+    width: 72%;
+    background: var(--text);
+    border-radius: 1px;
+  }
+
+  /* ── Top header ── */
+  .top-header {
+    padding: 14px 22px 8px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .top-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+  }
+  .top-title-chev {
+    color: var(--text-3);
+    font-size: 16px;
+    font-weight: 400;
+  }
+  .top-icons {
+    display: flex;
+    gap: 4px;
+  }
+  .icon-btn {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text);
+    font-size: 20px;
+    cursor: pointer;
+    border-radius: 50%;
+  }
+  .icon-btn:hover { background: var(--bg-elev); }
+  .icon-btn svg { width: 22px; height: 22px; }
+
+  /* ── Greeting ── */
+  .greeting {
+    padding: 14px 22px 18px;
+  }
+  .greeting-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 6px;
+  }
+  .greeting-text {
+    font-size: 15px;
+    color: var(--text-3);
+    font-weight: 500;
+    letter-spacing: -0.02em;
+  }
+  .greeting-text b { color: var(--text); font-weight: 700; }
+  .avatars {
+    display: flex;
+    align-items: center;
+  }
+  .avatar {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    color: #fff;
+    border: 2px solid var(--bg);
+    margin-left: -8px;
+    letter-spacing: -0.02em;
+  }
+  .avatar:first-child { margin-left: 0; }
+  .avatar.a1 { background: #EB4D3D; }
+  .avatar.a2 { background: #3182F6; }
+
+  /* ── Cards ── */
+  .card {
+    margin: 0 14px 10px;
+    background: var(--bg-elev);
+    border-radius: 22px;
+    padding: 22px 22px;
+  }
+
+  /* ── Net Worth Hero ── */
+  .nw-card { padding: 24px 22px 18px; }
+  .nw-label {
+    font-size: 14px;
+    color: var(--text-3);
+    font-weight: 500;
+    margin-bottom: 8px;
+    letter-spacing: -0.02em;
+  }
+  .nw-number {
+    font-size: 34px;
+    font-weight: 700;
+    letter-spacing: -0.04em;
+    line-height: 1.1;
+    color: var(--text);
+    font-variant-numeric: tabular-nums;
+    display: flex;
+    align-items: baseline;
+    gap: 4px;
+  }
+  .nw-number .won {
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--text-2);
+  }
+  .nw-change {
+    margin-top: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+  .nw-change .pct {
+    color: var(--up);
+    font-variant-numeric: tabular-nums;
+    font-weight: 700;
+  }
+  .nw-change .delta {
+    color: var(--text-3);
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ── Chart area ── */
+  .chart-wrap {
+    margin-top: 20px;
+    margin-left: -8px;
+    margin-right: -8px;
+  }
+  .chart-svg { width: 100%; height: 120px; display: block; }
+  .chart-axis {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 4px 0;
+    font-size: 11px;
+    color: var(--text-4);
+    font-variant-numeric: tabular-nums;
+    font-weight: 500;
+  }
+  .range-pills {
+    display: flex;
+    gap: 6px;
+    margin-top: 14px;
+    justify-content: center;
+  }
+  .pill {
+    padding: 6px 14px;
+    background: transparent;
+    color: var(--text-3);
+    font-size: 13px;
+    font-weight: 600;
+    border-radius: 100px;
+    cursor: pointer;
+    letter-spacing: -0.01em;
+  }
+  .pill.active {
+    background: var(--bg-chip);
+    color: var(--text);
+  }
+
+  /* ── Flow Card ── */
+  .flow-card {
+    padding: 22px 22px;
+  }
+  .card-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 18px;
+  }
+  .card-title {
+    font-size: 17px;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    color: var(--text);
+  }
+  .card-sub {
+    font-size: 13px;
+    color: var(--text-3);
+    font-weight: 500;
+  }
+
+  .flow-rows {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .flow-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .flow-row-label {
+    font-size: 15px;
+    color: var(--text-2);
+    font-weight: 500;
+    letter-spacing: -0.02em;
+  }
+  .flow-row-value {
+    font-size: 17px;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    font-variant-numeric: tabular-nums;
+  }
+  .flow-row-value.income { color: var(--text); }
+  .flow-row-value.expense { color: var(--text); }
+  .flow-row-value.saving { color: var(--up); }
+
+  .flow-divider {
+    height: 1px;
+    background: var(--border);
+    margin: 6px 0;
+  }
+
+  .saving-bar {
+    margin-top: 4px;
+    height: 6px;
+    background: var(--bg-chip);
+    border-radius: 100px;
+    overflow: hidden;
+  }
+  .saving-bar-fill {
+    height: 100%;
+    width: 60.9%;
+    background: var(--up);
+    border-radius: 100px;
+  }
+  .saving-meta {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 8px;
+    font-size: 12px;
+    color: var(--text-3);
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ── Snapshot Alert ── */
+  .alert {
+    margin: 0 14px 10px;
+    background: linear-gradient(135deg, #1D2332 0%, #1A1D25 100%);
+    border-radius: 22px;
+    padding: 20px 22px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    position: relative;
+    overflow: hidden;
+  }
+  .alert::before {
+    content: '';
+    position: absolute;
+    top: -30px;
+    right: -30px;
+    width: 140px;
+    height: 140px;
+    background: radial-gradient(circle, rgba(49,130,246,0.25) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .alert-icon {
+    width: 44px;
+    height: 44px;
+    background: var(--accent);
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 22px;
+    z-index: 1;
+  }
+  .alert-body {
+    flex: 1;
+    z-index: 1;
+  }
+  .alert-title {
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    color: var(--text);
+    margin-bottom: 2px;
+  }
+  .alert-sub {
+    font-size: 13px;
+    color: var(--text-3);
+    font-weight: 500;
+    letter-spacing: -0.02em;
+  }
+  .alert-cta {
+    color: var(--text-3);
+    font-size: 20px;
+    z-index: 1;
+  }
+
+  /* ── Allocation Card ── */
+  .alloc-card { padding: 22px 22px 12px; }
+
+  .alloc-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 0;
+  }
+  .alloc-row + .alloc-row { border-top: 1px solid var(--border); }
+
+  .alloc-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 22px;
+  }
+  .alloc-icon.real { background: #1E3A2C; }
+  .alloc-icon.stock { background: #3A1E1E; }
+  .alloc-icon.cash { background: #1E2B3A; }
+  .alloc-icon.pension { background: #2D1E3A; }
+
+  .alloc-body { flex: 1; min-width: 0; }
+  .alloc-title-row {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin-bottom: 2px;
+  }
+  .alloc-amount {
+    font-size: 17px;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    color: var(--text);
+    font-variant-numeric: tabular-nums;
+  }
+  .alloc-pct {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
+  }
+  .alloc-pct.up { color: var(--up); }
+  .alloc-pct.down { color: var(--down); }
+  .alloc-name {
+    font-size: 13px;
+    color: var(--text-3);
+    font-weight: 500;
+    letter-spacing: -0.02em;
+  }
+  .alloc-arrow {
+    color: var(--text-4);
+    font-size: 18px;
+  }
+
+  .card-btn {
+    display: block;
+    width: 100%;
+    background: transparent;
+    border: none;
+    padding: 14px 0 2px;
+    color: var(--text-2);
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    cursor: pointer;
+    text-align: center;
+    border-top: 1px solid var(--border);
+    margin-top: 6px;
+    font-family: 'Pretendard', sans-serif;
+  }
+
+  /* ── Transactions Card ── */
+  .tx-card { padding: 22px 22px 12px; }
+
+  .tx-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 0;
+  }
+  .tx-row + .tx-row { border-top: 1px solid var(--border); }
+
+  .tx-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    background: var(--bg-chip);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 18px;
+  }
+
+  .tx-body { flex: 1; min-width: 0; }
+  .tx-title {
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    color: var(--text);
+    margin-bottom: 2px;
+  }
+  .tx-meta {
+    font-size: 12px;
+    color: var(--text-3);
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .tx-meta .who-dot {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+  }
+  .tx-meta .who-dot.a1 { background: #EB4D3D; }
+  .tx-meta .who-dot.a2 { background: #3182F6; }
+
+  .tx-amount {
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    font-variant-numeric: tabular-nums;
+  }
+  .tx-amount.minus { color: var(--text); }
+  .tx-amount.plus { color: var(--up); }
+
+  /* ── Tab bar ── */
+  .tabbar {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    background: rgba(10, 11, 14, 0.92);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-top: 1px solid var(--border);
+    padding: 8px 0 22px;
+    display: grid;
+    grid-template-columns: 1fr 1fr 80px 1fr 1fr;
+    align-items: center;
+    z-index: 50;
+  }
+  .tab {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    color: var(--text-4);
+    cursor: pointer;
+    padding: 6px 0;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+  .tab.active { color: var(--text); }
+  .tab-ico {
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .tab-ico svg {
+    width: 22px;
+    height: 22px;
+    fill: currentColor;
+  }
+
+  .fab-wrap { display: flex; justify-content: center; }
+  .fab {
+    width: 54px;
+    height: 54px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    margin-top: -26px;
+    box-shadow: 0 8px 24px rgba(49,130,246,0.45), 0 2px 4px rgba(0,0,0,0.2);
+    transition: transform 0.15s;
+    font-size: 28px;
+    font-weight: 300;
+    line-height: 1;
+  }
+  .fab:hover { transform: translateY(-2px); }
+
+  /* Spacing helpers */
+  .section-gap { height: 4px; }
+
+</style>
+</head>
+<body>
+  <div class="device">
+    <div class="app">
+
+      <!-- Status bar -->
+      <div class="status">
+        <span class="time">9:41</span>
+        <div class="status-right">
+          <div class="signal-bars"><span></span><span></span><span></span><span></span></div>
+          <div class="battery"><div class="battery-fill"></div></div>
+        </div>
+      </div>
+
+      <!-- Top header -->
+      <div class="top-header">
+        <div class="top-title">
+          우리 가계
+          <span class="top-title-chev">∨</span>
+        </div>
+        <div class="top-icons">
+          <div class="icon-btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/>
+              <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+            </svg>
+          </div>
+          <div class="icon-btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"/>
+              <path d="m21 21-4.35-4.35"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Greeting -->
+      <div class="greeting">
+        <div class="greeting-row">
+          <div class="greeting-text">안녕하세요, <b>인조</b>님 👋</div>
+          <div class="avatars">
+            <div class="avatar a1">인</div>
+            <div class="avatar a2">수</div>
+          </div>
+        </div>
+        <div class="greeting-text">2026년 4월 21일 · 화요일</div>
+      </div>
+
+      <!-- Net Worth Hero -->
+      <div class="card nw-card">
+        <div class="nw-label">총 순자산</div>
+        <div class="nw-number">
+          324,580,200<span class="won">원</span>
+        </div>
+        <div class="nw-change">
+          <span class="pct">+2.4%</span>
+          <span class="delta">+7,580,200원 · 전월 대비</span>
+        </div>
+
+        <div class="chart-wrap">
+          <svg class="chart-svg" viewBox="0 0 380 120" preserveAspectRatio="none">
+            <defs>
+              <linearGradient id="nwFill" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#EB4D3D" stop-opacity="0.22"/>
+                <stop offset="100%" stop-color="#EB4D3D" stop-opacity="0"/>
+              </linearGradient>
+            </defs>
+
+            <!-- Subtle horizontal guides -->
+            <line x1="10" y1="30" x2="370" y2="30" stroke="#2B2D31" stroke-width="0.6" stroke-dasharray="2 4"/>
+            <line x1="10" y1="70" x2="370" y2="70" stroke="#2B2D31" stroke-width="0.6" stroke-dasharray="2 4"/>
+
+            <!-- Fill -->
+            <path d="M 10 95 C 50 90, 70 74, 95 66 C 125 56, 145 50, 170 46 C 200 40, 220 36, 245 30 C 275 24, 295 20, 320 16 C 345 14, 360 12, 370 10 L 370 110 L 10 110 Z" fill="url(#nwFill)"/>
+
+            <!-- Line -->
+            <path d="M 10 95 C 50 90, 70 74, 95 66 C 125 56, 145 50, 170 46 C 200 40, 220 36, 245 30 C 275 24, 295 20, 320 16 C 345 14, 360 12, 370 10" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+
+            <!-- Points -->
+            <circle cx="10" cy="95" r="2" fill="#FFFFFF" opacity="0.5"/>
+            <circle cx="82" cy="70" r="2" fill="#FFFFFF" opacity="0.5"/>
+            <circle cx="154" cy="50" r="2" fill="#FFFFFF" opacity="0.5"/>
+            <circle cx="226" cy="34" r="2" fill="#FFFFFF" opacity="0.5"/>
+            <circle cx="298" cy="18" r="2" fill="#FFFFFF" opacity="0.5"/>
+            <circle cx="370" cy="10" r="5" fill="#EB4D3D" stroke="#FFFFFF" stroke-width="2"/>
+          </svg>
+          <div class="chart-axis">
+            <span>11월</span>
+            <span>12월</span>
+            <span>1월</span>
+            <span>2월</span>
+            <span>3월</span>
+            <span>4월</span>
+          </div>
+        </div>
+
+        <div class="range-pills">
+          <div class="pill">1M</div>
+          <div class="pill active">6M</div>
+          <div class="pill">1Y</div>
+          <div class="pill">ALL</div>
+        </div>
+      </div>
+
+      <!-- Monthly Flow -->
+      <div class="card flow-card">
+        <div class="card-head">
+          <div class="card-title">이번 달 흐름</div>
+          <div class="card-sub">4월 · 21일 기준</div>
+        </div>
+
+        <div class="flow-rows">
+          <div class="flow-row">
+            <div class="flow-row-label">수입</div>
+            <div class="flow-row-value income">+12,400,000원</div>
+          </div>
+          <div class="flow-row">
+            <div class="flow-row-label">지출</div>
+            <div class="flow-row-value expense">−4,850,000원</div>
+          </div>
+          <div class="flow-divider"></div>
+          <div class="flow-row">
+            <div class="flow-row-label">저축</div>
+            <div class="flow-row-value saving">7,550,000원</div>
+          </div>
+
+          <div>
+            <div class="saving-bar">
+              <div class="saving-bar-fill"></div>
+            </div>
+            <div class="saving-meta">
+              <span>저축률 60.9%</span>
+              <span>목표 50.0%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Snapshot Alert -->
+      <div class="alert">
+        <div class="alert-icon">📸</div>
+        <div class="alert-body">
+          <div class="alert-title">4월 자산 스냅샷을 남겨주세요</div>
+          <div class="alert-sub">매월 말 잔액을 기록하면 추이가 정확해져요</div>
+        </div>
+        <div class="alert-cta">›</div>
+      </div>
+
+      <!-- Asset Allocation -->
+      <div class="card alloc-card">
+        <div class="card-head">
+          <div class="card-title">자산 구성</div>
+          <div class="card-sub">4개 카테고리</div>
+        </div>
+
+        <div class="alloc-row">
+          <div class="alloc-icon real">🏠</div>
+          <div class="alloc-body">
+            <div class="alloc-title-row">
+              <div class="alloc-amount">1억 6,000만원</div>
+              <div class="alloc-pct up">+44.9%</div>
+            </div>
+            <div class="alloc-name">부동산 · 49.3%</div>
+          </div>
+          <div class="alloc-arrow">›</div>
+        </div>
+
+        <div class="alloc-row">
+          <div class="alloc-icon stock">📈</div>
+          <div class="alloc-body">
+            <div class="alloc-title-row">
+              <div class="alloc-amount">9,850만원</div>
+              <div class="alloc-pct up">+8.2%</div>
+            </div>
+            <div class="alloc-name">주식 · 펀드 · 30.3%</div>
+          </div>
+          <div class="alloc-arrow">›</div>
+        </div>
+
+        <div class="alloc-row">
+          <div class="alloc-icon cash">💰</div>
+          <div class="alloc-body">
+            <div class="alloc-title-row">
+              <div class="alloc-amount">4,800만원</div>
+            </div>
+            <div class="alloc-name">현금 · 예금 · 14.8%</div>
+          </div>
+          <div class="alloc-arrow">›</div>
+        </div>
+
+        <div class="alloc-row">
+          <div class="alloc-icon pension">🪙</div>
+          <div class="alloc-body">
+            <div class="alloc-title-row">
+              <div class="alloc-amount">1,808만원</div>
+              <div class="alloc-pct down">−1.4%</div>
+            </div>
+            <div class="alloc-name">연금 · 기타 · 5.6%</div>
+          </div>
+          <div class="alloc-arrow">›</div>
+        </div>
+
+        <button class="card-btn">자산 전체보기</button>
+      </div>
+
+      <!-- Recent Transactions -->
+      <div class="card tx-card">
+        <div class="card-head">
+          <div class="card-title">최근 거래</div>
+          <div class="card-sub">이번 주</div>
+        </div>
+
+        <div class="tx-row">
+          <div class="tx-icon">🍜</div>
+          <div class="tx-body">
+            <div class="tx-title">점심 식사</div>
+            <div class="tx-meta">
+              <span>식비</span>
+              <span>·</span>
+              <span><span class="who-dot a1"></span> 인조</span>
+              <span>·</span>
+              <span>오늘 12:48</span>
+            </div>
+          </div>
+          <div class="tx-amount minus">−12,500원</div>
+        </div>
+
+        <div class="tx-row">
+          <div class="tx-icon">💼</div>
+          <div class="tx-body">
+            <div class="tx-title">4월 월급</div>
+            <div class="tx-meta">
+              <span>급여</span>
+              <span>·</span>
+              <span><span class="who-dot a2"></span> 수진</span>
+              <span>·</span>
+              <span>어제 09:02</span>
+            </div>
+          </div>
+          <div class="tx-amount plus">+6,500,000원</div>
+        </div>
+
+        <div class="tx-row">
+          <div class="tx-icon">🛒</div>
+          <div class="tx-body">
+            <div class="tx-title">이마트 장보기</div>
+            <div class="tx-meta">
+              <span>식비</span>
+              <span>·</span>
+              <span><span class="who-dot a1"></span> 인조</span>
+              <span>·</span>
+              <span>어제 19:34</span>
+            </div>
+          </div>
+          <div class="tx-amount minus">−82,300원</div>
+        </div>
+
+        <button class="card-btn">거래 전체보기</button>
+      </div>
+
+      <div class="section-gap"></div>
+    </div>
+
+    <!-- Tab bar -->
+    <nav class="tabbar">
+      <div class="tab active">
+        <div class="tab-ico">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3 2 12h3v8h5v-6h4v6h5v-8h3L12 3z"/></svg>
+        </div>
+        <span>홈</span>
+      </div>
+      <div class="tab">
+        <div class="tab-ico">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+        </div>
+        <span>거래</span>
+      </div>
+      <div class="fab-wrap">
+        <div class="fab">+</div>
+      </div>
+      <div class="tab">
+        <div class="tab-ico">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12c0 5-4 9-9 9s-9-4-9-9 4-9 9-9c1.66 0 3.22.45 4.56 1.23"/><polyline points="12 12 21 3 21 9"/></svg>
+        </div>
+        <span>자산</span>
+      </div>
+      <div class="tab">
+        <div class="tab-ico">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        </div>
+        <span>설정</span>
+      </div>
+    </nav>
+  </div>
+</body>
+</html>

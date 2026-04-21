@@ -1,0 +1,1214 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>4월 가계 리포트</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
+<style>
+  :root {
+    --bg: #000000;
+    --bg-elev: #18191C;
+    --bg-elev-2: #212226;
+    --bg-chip: #2A2B2F;
+    --text: #FFFFFF;
+    --text-2: #D4D6DA;
+    --text-3: #8B8E95;
+    --text-4: #5C5F66;
+    --border: #2B2D31;
+    --border-soft: #1F2024;
+    --up: #EB4D3D;
+    --up-soft: rgba(235, 77, 61, 0.14);
+    --down: #3182F6;
+    --down-soft: rgba(49, 130, 246, 0.14);
+    --accent: #3182F6;
+    --success: #1CB572;
+    --success-soft: rgba(28, 181, 114, 0.14);
+    --success-bg: rgba(28, 181, 114, 0.08);
+    --warn: #F5A623;
+    --warn-soft: rgba(245, 166, 35, 0.14);
+    --warn-bg: rgba(245, 166, 35, 0.08);
+    --danger: #EB4D3D;
+    --danger-soft: rgba(235, 77, 61, 0.14);
+    --danger-bg: rgba(235, 77, 61, 0.08);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
+  button { font-family: inherit; border: none; background: none; color: inherit; cursor: pointer; }
+
+  html, body {
+    background: #0B0C0E;
+    font-family: 'Pretendard', -apple-system, sans-serif;
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    background: radial-gradient(ellipse at top, #1A1C20 0%, #050507 100%);
+  }
+
+  .device {
+    width: 100%;
+    max-width: 420px;
+    background: var(--bg);
+    border-radius: 44px;
+    overflow: hidden;
+    box-shadow: 0 0 0 1px rgba(255,255,255,0.04), 0 40px 80px rgba(0,0,0,0.6);
+    position: relative;
+    border: 6px solid #1A1B1E;
+    height: 900px;
+  }
+
+  .app {
+    position: relative;
+    padding-bottom: 40px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    height: 100%;
+  }
+  .app::-webkit-scrollbar { display: none; }
+  .app { scrollbar-width: none; }
+
+  /* ── Status ── */
+  .status {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 26px 10px;
+    font-size: 15px;
+    font-weight: 600;
+  }
+  .signal-bars { display: flex; align-items: flex-end; gap: 2px; height: 11px; }
+  .signal-bars span { width: 3px; background: var(--text); border-radius: 0.5px; }
+  .signal-bars span:nth-child(1) { height: 3px; }
+  .signal-bars span:nth-child(2) { height: 5px; }
+  .signal-bars span:nth-child(3) { height: 8px; }
+  .signal-bars span:nth-child(4) { height: 11px; }
+  .battery { width: 26px; height: 12px; border: 1px solid rgba(255,255,255,0.5); border-radius: 3px; position: relative; padding: 1px; }
+  .battery::after { content: ''; position: absolute; right: -3px; top: 3px; width: 2px; height: 4px; background: rgba(255,255,255,0.5); border-radius: 0 2px 2px 0; }
+  .battery-fill { height: 100%; width: 72%; background: var(--text); border-radius: 1px; }
+  .status-right { display: flex; gap: 6px; align-items: center; }
+
+  /* ── Top nav ── */
+  .topnav {
+    display: grid;
+    grid-template-columns: 44px 1fr 44px;
+    align-items: center;
+    padding: 8px 14px 4px;
+  }
+  .nav-btn {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text);
+    border-radius: 50%;
+  }
+  .nav-btn:hover { background: var(--bg-elev); }
+  .nav-btn svg { width: 22px; height: 22px; stroke: currentColor; stroke-width: 2; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+  .nav-title {
+    text-align: center;
+    font-size: 17px;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+  }
+
+  /* ── Month switcher ── */
+  .month-switch {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    padding: 4px 0 12px;
+  }
+  .month-arrow {
+    color: var(--text-3);
+    font-size: 18px;
+    cursor: pointer;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .month-arrow:hover { color: var(--text); }
+  .month-current {
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+  }
+  .month-current .year { color: var(--text-3); font-weight: 500; }
+
+  /* ── Hero card ── */
+  .hero {
+    margin: 14px 14px 10px;
+    background: linear-gradient(160deg, #0F2720 0%, #18191C 60%);
+    border: 1px solid rgba(28, 181, 114, 0.18);
+    border-radius: 22px;
+    padding: 26px 22px 22px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -50px;
+    right: -40px;
+    width: 200px;
+    height: 200px;
+    background: radial-gradient(circle, rgba(28, 181, 114, 0.3) 0%, transparent 65%);
+    pointer-events: none;
+  }
+  .hero-meta {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 10px;
+    background: var(--success-soft);
+    color: var(--success);
+    border-radius: 100px;
+    font-size: 11px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    position: relative;
+  }
+  .hero-meta::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--success);
+  }
+
+  .hero-lead {
+    font-size: 14px;
+    color: var(--text-3);
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    margin-bottom: 4px;
+    position: relative;
+  }
+  .hero-number {
+    font-size: 38px;
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    line-height: 1.1;
+    position: relative;
+    font-variant-numeric: tabular-nums;
+  }
+  .hero-number .won {
+    font-size: 22px;
+    color: var(--text-2);
+    margin-left: 2px;
+  }
+  .hero-tagline {
+    margin-top: 10px;
+    font-size: 13px;
+    color: var(--text-2);
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    line-height: 1.5;
+    position: relative;
+  }
+  .hero-tagline b { color: var(--success); font-weight: 700; }
+
+  .hero-stats {
+    margin-top: 18px;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 1px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 14px;
+    overflow: hidden;
+    position: relative;
+  }
+  .hero-stat {
+    background: rgba(255,255,255,0.03);
+    padding: 14px 10px;
+    text-align: center;
+  }
+  .hero-stat-label {
+    font-size: 11px;
+    color: var(--text-3);
+    font-weight: 600;
+    margin-bottom: 6px;
+    letter-spacing: -0.02em;
+  }
+  .hero-stat-value {
+    font-size: 15px;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    font-variant-numeric: tabular-nums;
+  }
+  .hero-stat-delta {
+    font-size: 10px;
+    font-weight: 700;
+    margin-top: 3px;
+    letter-spacing: -0.01em;
+  }
+  .hero-stat-delta.up { color: var(--success); }
+  .hero-stat-delta.down { color: var(--danger); }
+
+  /* ── Section label ── */
+  .sec-label {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-2);
+    letter-spacing: -0.03em;
+    padding: 22px 22px 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .sec-label-meta {
+    font-size: 12px;
+    color: var(--text-3);
+    font-weight: 500;
+  }
+
+  /* ── Card base ── */
+  .card {
+    margin: 0 14px 10px;
+    background: var(--bg-elev);
+    border-radius: 22px;
+    padding: 20px 22px;
+  }
+
+  /* ── Cash flow comparison ── */
+  .flow-card { padding: 22px; }
+  .flow-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 18px;
+  }
+  .flow-title {
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+  }
+  .flow-legend {
+    display: flex;
+    gap: 12px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-3);
+  }
+  .flow-legend .dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 2px;
+    margin-right: 5px;
+    vertical-align: middle;
+  }
+
+  .flow-bars {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+  .flow-bar-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .flow-bar-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+  }
+  .flow-bar-name {
+    font-size: 13px;
+    color: var(--text-2);
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+  .flow-bar-amount {
+    font-size: 15px;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    font-variant-numeric: tabular-nums;
+  }
+  .flow-bar-amount .delta {
+    font-size: 11px;
+    font-weight: 700;
+    margin-left: 6px;
+  }
+  .flow-bar-amount .delta.up { color: var(--success); }
+  .flow-bar-amount .delta.down { color: var(--danger); }
+
+  .flow-bar-track {
+    position: relative;
+    height: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+  .flow-sub-bar {
+    height: 7px;
+    background: var(--bg-chip);
+    border-radius: 100px;
+    position: relative;
+    overflow: hidden;
+  }
+  .flow-sub-fill {
+    height: 100%;
+    border-radius: 100px;
+  }
+  .flow-sub-fill.current { background: var(--text); }
+  .flow-sub-fill.prev { background: var(--text-4); }
+
+  /* ── Budget card ── */
+  .budget-card { padding: 4px 0; }
+  .budget-row {
+    display: grid;
+    grid-template-columns: 36px 1fr auto;
+    gap: 14px;
+    align-items: center;
+    padding: 14px 22px;
+  }
+  .budget-row + .budget-row { border-top: 1px solid var(--border-soft); }
+  .budget-emoji {
+    width: 36px;
+    height: 36px;
+    border-radius: 11px;
+    background: var(--bg-chip);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+  }
+  .budget-body { min-width: 0; }
+  .budget-label-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 6px;
+  }
+  .budget-name {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+  }
+  .budget-amounts {
+    font-size: 12px;
+    color: var(--text-3);
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.01em;
+  }
+  .budget-amounts .spent {
+    color: var(--text);
+    font-weight: 700;
+  }
+  .budget-track {
+    height: 6px;
+    background: var(--bg-chip);
+    border-radius: 100px;
+    overflow: hidden;
+  }
+  .budget-fill {
+    height: 100%;
+    border-radius: 100px;
+  }
+  .budget-fill.ok { background: var(--success); }
+  .budget-fill.warn { background: var(--warn); }
+  .budget-fill.over { background: var(--danger); }
+  .budget-pct {
+    font-size: 13px;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.02em;
+    width: 44px;
+    text-align: right;
+  }
+  .budget-pct.ok { color: var(--success); }
+  .budget-pct.warn { color: var(--warn); }
+  .budget-pct.over { color: var(--danger); }
+
+  /* ── Category split ── */
+  .cat-card {
+    padding: 22px;
+  }
+  .cat-stacked {
+    height: 14px;
+    border-radius: 100px;
+    overflow: hidden;
+    display: flex;
+    margin-bottom: 18px;
+  }
+  .cat-seg {
+    height: 100%;
+  }
+  .cat-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .cat-list-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .cat-list-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .cat-swatch {
+    width: 8px;
+    height: 8px;
+    border-radius: 2px;
+  }
+  .cat-label {
+    font-size: 13px;
+    color: var(--text-2);
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+  .cat-right {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+  }
+  .cat-amount {
+    font-size: 13px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.02em;
+  }
+  .cat-change {
+    font-size: 11px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    width: 54px;
+    text-align: right;
+  }
+  .cat-change.up { color: var(--danger); }
+  .cat-change.down { color: var(--success); }
+
+  /* ── Insight cards ── */
+  .insight-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 0 14px 10px;
+  }
+  .insight {
+    background: var(--bg-elev);
+    border-radius: 18px;
+    padding: 16px 18px;
+    display: grid;
+    grid-template-columns: 36px 1fr;
+    gap: 14px;
+    align-items: flex-start;
+  }
+  .insight-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 11px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+  .insight-icon.good { background: var(--success-bg); color: var(--success); }
+  .insight-icon.warn { background: var(--warn-bg); color: var(--warn); }
+  .insight-icon.info { background: var(--down-soft); color: var(--down); }
+  .insight-body {}
+  .insight-title {
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    margin-bottom: 3px;
+    line-height: 1.35;
+  }
+  .insight-desc {
+    font-size: 12px;
+    color: var(--text-3);
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    line-height: 1.5;
+  }
+  .insight-desc .hl { color: var(--text-2); font-weight: 600; }
+
+  /* ── Goal card ── */
+  .goal-card {
+    padding: 20px 22px;
+  }
+  .goal-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 14px;
+  }
+  .goal-name {
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+  }
+  .goal-eta {
+    font-size: 11px;
+    color: var(--text-3);
+    font-weight: 600;
+  }
+  .goal-numbers {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    margin-bottom: 10px;
+  }
+  .goal-current {
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    font-variant-numeric: tabular-nums;
+  }
+  .goal-target {
+    font-size: 13px;
+    color: var(--text-3);
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+  .goal-track {
+    height: 8px;
+    background: var(--bg-chip);
+    border-radius: 100px;
+    overflow: hidden;
+    margin-bottom: 10px;
+  }
+  .goal-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #1CB572 0%, #3FD888 100%);
+    border-radius: 100px;
+  }
+  .goal-footer {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    font-weight: 600;
+  }
+  .goal-pct { color: var(--success); font-variant-numeric: tabular-nums; }
+  .goal-pace {
+    color: var(--text-3);
+    font-variant-numeric: tabular-nums;
+  }
+  .goal-pace b { color: var(--text-2); font-weight: 700; }
+
+  /* ── Investment card ── */
+  .invest-card { padding: 22px; }
+  .invest-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 16px;
+  }
+  .invest-title { font-size: 15px; font-weight: 700; letter-spacing: -0.03em; }
+  .invest-sync {
+    font-size: 10px;
+    color: var(--text-3);
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .invest-sync::before {
+    content: '';
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--success);
+  }
+  .invest-main {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin-bottom: 4px;
+  }
+  .invest-value {
+    font-size: 24px;
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    font-variant-numeric: tabular-nums;
+  }
+  .invest-chg {
+    font-size: 13px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    color: var(--up);
+  }
+  .invest-sub {
+    font-size: 12px;
+    color: var(--text-3);
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    margin-bottom: 16px;
+  }
+  .invest-holdings {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .hold-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .hold-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .hold-tag {
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    background: var(--bg-chip);
+    color: var(--text-3);
+  }
+  .hold-name {
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+  .hold-right {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+  }
+  .hold-val {
+    font-size: 13px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.02em;
+  }
+  .hold-pct {
+    font-size: 11px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    width: 52px;
+    text-align: right;
+  }
+  .hold-pct.up { color: var(--up); }
+  .hold-pct.down { color: var(--down); }
+
+  /* ── Next month preview ── */
+  .next-card {
+    margin: 0 14px 16px;
+    background: linear-gradient(135deg, #1D2332 0%, #18191C 100%);
+    border: 1px solid rgba(49, 130, 246, 0.2);
+    border-radius: 22px;
+    padding: 22px;
+    position: relative;
+    overflow: hidden;
+  }
+  .next-card::before {
+    content: '';
+    position: absolute;
+    top: -40px;
+    right: -40px;
+    width: 160px;
+    height: 160px;
+    background: radial-gradient(circle, rgba(49, 130, 246, 0.25) 0%, transparent 65%);
+    pointer-events: none;
+  }
+  .next-kicker {
+    display: inline-block;
+    padding: 4px 10px;
+    background: var(--down-soft);
+    color: var(--accent);
+    border-radius: 100px;
+    font-size: 11px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    position: relative;
+  }
+  .next-title {
+    font-size: 18px;
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    line-height: 1.3;
+    margin-bottom: 14px;
+    position: relative;
+  }
+  .next-items {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    position: relative;
+  }
+  .next-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 13px;
+    color: var(--text-2);
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    line-height: 1.5;
+  }
+  .next-item::before {
+    content: '';
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    background: var(--accent);
+    margin-top: 8px;
+    flex-shrink: 0;
+  }
+  .next-item b { color: var(--text); font-weight: 700; }
+
+  /* ── Footer ── */
+  .report-footer {
+    padding: 30px 22px 30px;
+    text-align: center;
+  }
+  .footer-text {
+    font-size: 11px;
+    color: var(--text-4);
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+</style>
+</head>
+<body>
+  <div class="device">
+    <div class="app">
+
+      <!-- Status -->
+      <div class="status">
+        <span>9:41</span>
+        <div class="status-right">
+          <div class="signal-bars"><span></span><span></span><span></span><span></span></div>
+          <div class="battery"><div class="battery-fill"></div></div>
+        </div>
+      </div>
+
+      <!-- Top nav -->
+      <div class="topnav">
+        <button class="nav-btn">
+          <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <div class="nav-title">가계 리포트</div>
+        <button class="nav-btn">
+          <svg viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+        </button>
+      </div>
+
+      <!-- Month switcher -->
+      <div class="month-switch">
+        <div class="month-arrow">‹</div>
+        <div class="month-current"><span class="year">2026 ·</span> 4월</div>
+        <div class="month-arrow">›</div>
+      </div>
+
+      <!-- Hero -->
+      <div class="hero">
+        <div class="hero-meta">이번 달 완료</div>
+        <div class="hero-lead">4월에 모은 돈</div>
+        <div class="hero-number">
+          7,550,000<span class="won">원</span>
+        </div>
+        <div class="hero-tagline">
+          목표 저축률 <b>50% 대비 +10.9%p</b>를 달성했어요.<br>
+          연간 기준으로 역대 3번째 기록이에요. 🎯
+        </div>
+
+        <div class="hero-stats">
+          <div class="hero-stat">
+            <div class="hero-stat-label">수입</div>
+            <div class="hero-stat-value">12.4M</div>
+            <div class="hero-stat-delta up">+4.2%</div>
+          </div>
+          <div class="hero-stat">
+            <div class="hero-stat-label">지출</div>
+            <div class="hero-stat-value">4.85M</div>
+            <div class="hero-stat-delta down">−11.3%</div>
+          </div>
+          <div class="hero-stat">
+            <div class="hero-stat-label">저축률</div>
+            <div class="hero-stat-value">60.9%</div>
+            <div class="hero-stat-delta up">+5.8%p</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Cash flow vs last month -->
+      <div class="sec-label">
+        전월 비교
+        <span class="sec-label-meta">3월 → 4월</span>
+      </div>
+
+      <div class="card flow-card">
+        <div class="flow-head">
+          <div class="flow-title">현금 흐름</div>
+          <div class="flow-legend">
+            <span><span class="dot" style="background:#FFFFFF"></span>4월</span>
+            <span><span class="dot" style="background:#5C5F66"></span>3월</span>
+          </div>
+        </div>
+
+        <div class="flow-bars">
+          <div class="flow-bar-group">
+            <div class="flow-bar-label">
+              <span class="flow-bar-name">수입</span>
+              <span class="flow-bar-amount">12,400,000원<span class="delta up">+4.2%</span></span>
+            </div>
+            <div class="flow-bar-track">
+              <div class="flow-sub-bar"><div class="flow-sub-fill current" style="width: 100%"></div></div>
+              <div class="flow-sub-bar"><div class="flow-sub-fill prev" style="width: 96%"></div></div>
+            </div>
+          </div>
+
+          <div class="flow-bar-group">
+            <div class="flow-bar-label">
+              <span class="flow-bar-name">지출</span>
+              <span class="flow-bar-amount">4,850,000원<span class="delta down">−11.3%</span></span>
+            </div>
+            <div class="flow-bar-track">
+              <div class="flow-sub-bar"><div class="flow-sub-fill current" style="width: 44%"></div></div>
+              <div class="flow-sub-bar"><div class="flow-sub-fill prev" style="width: 50%"></div></div>
+            </div>
+          </div>
+
+          <div class="flow-bar-group">
+            <div class="flow-bar-label">
+              <span class="flow-bar-name">저축</span>
+              <span class="flow-bar-amount">7,550,000원<span class="delta up">+18.9%</span></span>
+            </div>
+            <div class="flow-bar-track">
+              <div class="flow-sub-bar"><div class="flow-sub-fill current" style="width: 61%"></div></div>
+              <div class="flow-sub-bar"><div class="flow-sub-fill prev" style="width: 51%"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Budget status -->
+      <div class="sec-label">
+        예산 현황
+        <span class="sec-label-meta">6개 카테고리 · 1건 초과</span>
+      </div>
+
+      <div class="card budget-card" style="padding: 0;">
+
+        <div class="budget-row">
+          <div class="budget-emoji">🍜</div>
+          <div class="budget-body">
+            <div class="budget-label-row">
+              <span class="budget-name">식비</span>
+              <span class="budget-amounts"><span class="spent">487,300</span> / 500,000원</span>
+            </div>
+            <div class="budget-track"><div class="budget-fill warn" style="width: 97%"></div></div>
+          </div>
+          <div class="budget-pct warn">97%</div>
+        </div>
+
+        <div class="budget-row">
+          <div class="budget-emoji">🚕</div>
+          <div class="budget-body">
+            <div class="budget-label-row">
+              <span class="budget-name">교통</span>
+              <span class="budget-amounts"><span class="spent">238,500</span> / 200,000원</span>
+            </div>
+            <div class="budget-track"><div class="budget-fill over" style="width: 100%"></div></div>
+          </div>
+          <div class="budget-pct over">119%</div>
+        </div>
+
+        <div class="budget-row">
+          <div class="budget-emoji">🏠</div>
+          <div class="budget-body">
+            <div class="budget-label-row">
+              <span class="budget-name">주거 · 공과금</span>
+              <span class="budget-amounts"><span class="spent">1,420,000</span> / 1,500,000원</span>
+            </div>
+            <div class="budget-track"><div class="budget-fill ok" style="width: 95%"></div></div>
+          </div>
+          <div class="budget-pct ok">95%</div>
+        </div>
+
+        <div class="budget-row">
+          <div class="budget-emoji">🛒</div>
+          <div class="budget-body">
+            <div class="budget-label-row">
+              <span class="budget-name">쇼핑</span>
+              <span class="budget-amounts"><span class="spent">312,400</span> / 500,000원</span>
+            </div>
+            <div class="budget-track"><div class="budget-fill ok" style="width: 62%"></div></div>
+          </div>
+          <div class="budget-pct ok">62%</div>
+        </div>
+
+        <div class="budget-row">
+          <div class="budget-emoji">🎬</div>
+          <div class="budget-body">
+            <div class="budget-label-row">
+              <span class="budget-name">여가</span>
+              <span class="budget-amounts"><span class="spent">180,000</span> / 400,000원</span>
+            </div>
+            <div class="budget-track"><div class="budget-fill ok" style="width: 45%"></div></div>
+          </div>
+          <div class="budget-pct ok">45%</div>
+        </div>
+
+        <div class="budget-row">
+          <div class="budget-emoji">💊</div>
+          <div class="budget-body">
+            <div class="budget-label-row">
+              <span class="budget-name">의료</span>
+              <span class="budget-amounts"><span class="spent">85,000</span> / 150,000원</span>
+            </div>
+            <div class="budget-track"><div class="budget-fill ok" style="width: 57%"></div></div>
+          </div>
+          <div class="budget-pct ok">57%</div>
+        </div>
+      </div>
+
+      <!-- Category split -->
+      <div class="sec-label">
+        지출 구성
+        <span class="sec-label-meta">전월 대비</span>
+      </div>
+
+      <div class="card cat-card">
+        <div class="cat-stacked">
+          <div class="cat-seg" style="width: 29.3%; background: #EB4D3D;"></div>
+          <div class="cat-seg" style="width: 29.3%; background: #3182F6;"></div>
+          <div class="cat-seg" style="width: 14.4%; background: #1CB572;"></div>
+          <div class="cat-seg" style="width: 9.9%; background: #F5A623;"></div>
+          <div class="cat-seg" style="width: 7.7%; background: #A487F0;"></div>
+          <div class="cat-seg" style="width: 9.4%; background: #5C5F66;"></div>
+        </div>
+
+        <div class="cat-list">
+          <div class="cat-list-row">
+            <div class="cat-list-left">
+              <span class="cat-swatch" style="background:#EB4D3D"></span>
+              <span class="cat-label">주거 · 공과금</span>
+            </div>
+            <div class="cat-right">
+              <span class="cat-amount">1,420,000원</span>
+              <span class="cat-change down">−3.2%</span>
+            </div>
+          </div>
+
+          <div class="cat-list-row">
+            <div class="cat-list-left">
+              <span class="cat-swatch" style="background:#3182F6"></span>
+              <span class="cat-label">식비</span>
+            </div>
+            <div class="cat-right">
+              <span class="cat-amount">1,421,300원</span>
+              <span class="cat-change up">+8.1%</span>
+            </div>
+          </div>
+
+          <div class="cat-list-row">
+            <div class="cat-list-left">
+              <span class="cat-swatch" style="background:#1CB572"></span>
+              <span class="cat-label">쇼핑</span>
+            </div>
+            <div class="cat-right">
+              <span class="cat-amount">698,400원</span>
+              <span class="cat-change down">−24.6%</span>
+            </div>
+          </div>
+
+          <div class="cat-list-row">
+            <div class="cat-list-left">
+              <span class="cat-swatch" style="background:#F5A623"></span>
+              <span class="cat-label">교통</span>
+            </div>
+            <div class="cat-right">
+              <span class="cat-amount">482,500원</span>
+              <span class="cat-change up">+42.1%</span>
+            </div>
+          </div>
+
+          <div class="cat-list-row">
+            <div class="cat-list-left">
+              <span class="cat-swatch" style="background:#A487F0"></span>
+              <span class="cat-label">여가</span>
+            </div>
+            <div class="cat-right">
+              <span class="cat-amount">380,000원</span>
+              <span class="cat-change down">−12.5%</span>
+            </div>
+          </div>
+
+          <div class="cat-list-row">
+            <div class="cat-list-left">
+              <span class="cat-swatch" style="background:#5C5F66"></span>
+              <span class="cat-label">기타</span>
+            </div>
+            <div class="cat-right">
+              <span class="cat-amount">455,800원</span>
+              <span class="cat-change up">+5.3%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Insights -->
+      <div class="sec-label">
+        이번 달 주요 인사이트
+        <span class="sec-label-meta">3건</span>
+      </div>
+
+      <div class="insight-grid">
+        <div class="insight">
+          <div class="insight-icon good">✓</div>
+          <div class="insight-body">
+            <div class="insight-title">저축률이 3개월 연속 올랐어요</div>
+            <div class="insight-desc">
+              2월 49.8% → 3월 55.1% → 4월 <span class="hl">60.9%</span>.<br>
+              목표치(50%)를 안정적으로 넘고 있어요.
+            </div>
+          </div>
+        </div>
+
+        <div class="insight">
+          <div class="insight-icon warn">!</div>
+          <div class="insight-body">
+            <div class="insight-title">교통비가 예산을 19% 초과했어요</div>
+            <div class="insight-desc">
+              휴가 기간 주유비 지출(<span class="hl">184,000원</span>)이 평소보다 많았어요. 다음 달 예산 재조정 또는 카테고리 이동을 고려해보세요.
+            </div>
+          </div>
+        </div>
+
+        <div class="insight">
+          <div class="insight-icon info">i</div>
+          <div class="insight-body">
+            <div class="insight-title">쇼핑 지출이 전월 대비 24.6% 감소</div>
+            <div class="insight-desc">
+              3월 평균 대비 <span class="hl">226,600원</span> 절약. 자동 반복결제 구독 정리 효과로 보여요.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Goal -->
+      <div class="sec-label">
+        목표 진행
+        <span class="sec-label-meta">주요 1건</span>
+      </div>
+
+      <div class="card goal-card">
+        <div class="goal-head">
+          <div class="goal-name">🏡 내 집 마련</div>
+          <div class="goal-eta">2029년 3월 예상</div>
+        </div>
+        <div class="goal-numbers">
+          <span class="goal-current">2억 1,040만원</span>
+          <span class="goal-target">/ 5억원</span>
+        </div>
+        <div class="goal-track">
+          <div class="goal-fill" style="width: 42%;"></div>
+        </div>
+        <div class="goal-footer">
+          <span class="goal-pct">42.1% 달성</span>
+          <span class="goal-pace">현 속도 유지 시 <b>11개월 단축</b></span>
+        </div>
+      </div>
+
+      <!-- Investment -->
+      <div class="sec-label">
+        투자 성과
+        <span class="sec-label-meta">실시간 시세 반영</span>
+      </div>
+
+      <div class="card invest-card">
+        <div class="invest-head">
+          <div class="invest-title">보유 자산</div>
+          <div class="invest-sync">실시간 연동</div>
+        </div>
+        <div class="invest-main">
+          <span class="invest-value">98,540,200원</span>
+          <span class="invest-chg">+8,040,200원 (+8.2%)</span>
+        </div>
+        <div class="invest-sub">4월 한 달간 평가이익 기준</div>
+
+        <div class="invest-holdings">
+          <div class="hold-row">
+            <div class="hold-left">
+              <span class="hold-tag">국내</span>
+              <span class="hold-name">삼성전자</span>
+            </div>
+            <div class="hold-right">
+              <span class="hold-val">32,450,000</span>
+              <span class="hold-pct up">+12.4%</span>
+            </div>
+          </div>
+          <div class="hold-row">
+            <div class="hold-left">
+              <span class="hold-tag">ETF</span>
+              <span class="hold-name">KODEX 200</span>
+            </div>
+            <div class="hold-right">
+              <span class="hold-val">24,800,000</span>
+              <span class="hold-pct up">+4.8%</span>
+            </div>
+          </div>
+          <div class="hold-row">
+            <div class="hold-left">
+              <span class="hold-tag">해외</span>
+              <span class="hold-name">S&amp;P 500 ETF</span>
+            </div>
+            <div class="hold-right">
+              <span class="hold-val">28,290,200</span>
+              <span class="hold-pct up">+6.1%</span>
+            </div>
+          </div>
+          <div class="hold-row">
+            <div class="hold-left">
+              <span class="hold-tag">채권</span>
+              <span class="hold-name">국고채 10Y</span>
+            </div>
+            <div class="hold-right">
+              <span class="hold-val">13,000,000</span>
+              <span class="hold-pct down">−1.2%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Next month preview -->
+      <div class="sec-label">다음 달 미리보기</div>
+
+      <div class="next-card">
+        <div class="next-kicker">5월 예측</div>
+        <div class="next-title">평소보다 지출이<br>클 수 있는 달이에요</div>
+        <div class="next-items">
+          <div class="next-item">
+            <span><b>어버이날</b>이 포함된 달 · 작년 5월 경조사 평균 <b>320,000원</b></span>
+          </div>
+          <div class="next-item">
+            <span><b>자동차 보험 갱신</b>이 5월 15일에 있어요 · 예상 <b>486,000원</b></span>
+          </div>
+          <div class="next-item">
+            <span>지난 3년 5월 평균 지출은 다른 달 대비 <b>+27%</b> 높았어요</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="report-footer">
+        <div class="footer-text">2026 · Vol. 11 · 강인조 &amp; 수진 가계</div>
+      </div>
+
+    </div>
+  </div>
+</body>
+</html>
