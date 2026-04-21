@@ -7,6 +7,7 @@ import {
   ScrollRestoration,
 } from 'react-router';
 
+import { useAuthListener } from '@/features/auth/hooks';
 import { theme } from '@/theme';
 
 export function Layout({ children }: { children: React.ReactNode }) {
@@ -71,6 +72,8 @@ const globalStyles = css`
 `;
 
 export default function App() {
+  useAuthListener();
+
   return (
     <ThemeProvider theme={theme}>
       <Global styles={globalStyles} />

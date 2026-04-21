@@ -8,6 +8,7 @@
 import styled from '@emotion/styled';
 import { Outlet, Link, useLocation } from 'react-router';
 
+import { AuthGuard } from '@/features/auth/components/AuthGuard';
 import { useQuickInputStore } from '@/stores/quickInput';
 
 const TABS = [
@@ -22,6 +23,7 @@ export function AppLayout() {
   const openQuickInput = useQuickInputStore((s) => s.open);
 
   return (
+    <AuthGuard>
     <Container>
       <Content>
         <Outlet />
@@ -58,6 +60,7 @@ export function AppLayout() {
         </Tab>
       </TabBar>
     </Container>
+    </AuthGuard>
   );
 }
 

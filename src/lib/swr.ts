@@ -1,9 +1,6 @@
 import type { SWRConfiguration } from 'swr';
 
-/**
- * SWR 공통 설정.
- * features/*/hooks 에서 `useSWR(key, fetcher, swrConfig)` 처럼 사용.
- */
+// SWR 공통 설정.
 export const swrConfig: SWRConfiguration = {
   revalidateOnFocus: true,
   revalidateOnReconnect: true,
