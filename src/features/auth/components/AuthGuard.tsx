@@ -16,6 +16,9 @@ export function AuthGuard({ children }: AuthGuardProps) {
   const userId = useAuthStore((s) => s.userId);
   const isLoading = useAuthStore((s) => s.isLoading);
 
+  // DEV: Supabase 없이 UI 확인할 때 아래 주석 해제
+  // return <>{children}</>;
+
   if (isLoading) {
     return (
       <LoadingWrap>

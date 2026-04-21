@@ -72,27 +72,21 @@ export function useAssetBreakdown(householdId: string | undefined) {
       const { data, error } = await supabase
         .from('v_asset_breakdown')
         .select('*')
-        .eq('household_id', householdId!)
-        .order('snapshot_date', { ascending: false })
-        .limit(10);
+        .eq('household_id', householdId!);
 
       if (error) throw error;
       if (!data || data.length === 0) return [];
 
-      // 가장 최근 날짜만
-      const latestDate = data[0]?.snapshot_date;
-      const latestRows = data.filter((r) => r.snapshot_date === latestDate);
+      const totalAssets = data
+        .filter((r) => r.category !== 'loan')
+        .reduce((sum, r) => sum + Number(r.value_krw), 0);
 
-      const totalAssets = latestRows
-        .filter((r) => r.asset_group !== 'loan')
-        .reduce((sum, r) => sum + Number(r.total_balance), 0);
-
-      return latestRows
-        .filter((r) => r.asset_group !== 'loan')
+      return data
+        .filter((r) => r.category !== 'loan')
         .map((r) => {
-          const group = r.asset_group as string;
+          const group = r.category as string;
           const config = GROUP_CONFIG[group] ?? { label: group, emoji: '📦', color: '#2A2B2F' };
-          const total = Number(r.total_balance);
+          const total = Number(r.value_krw);
           return {
             group,
             label: config.label,

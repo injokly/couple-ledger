@@ -406,7 +406,7 @@ export type Database = {
           category_id: string;
           category_name: string;
           category_icon: string | null;
-          total_amount: number;
+          total: number;
           tx_count: number;
         };
       };
@@ -425,15 +425,15 @@ export type Database = {
           is_archived: boolean;
           latest_balance: number | null;
           latest_snapshot_date: string | null;
+          latest_exchange_rate: number | null;
         };
       };
       v_asset_breakdown: {
         Relationships: [];
         Row: {
           household_id: string;
-          snapshot_date: string;
-          asset_group: string;
-          total_balance: number;
+          category: string;
+          value_krw: number;
           account_count: number;
         };
       };
