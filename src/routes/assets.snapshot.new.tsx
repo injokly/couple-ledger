@@ -355,24 +355,20 @@ const ChangeBadge = styled.span<{ $positive: boolean }>`
 
 const PadSection = styled.div`
   position: fixed;
-  bottom: 80px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 100%;
-  max-width: 420px;
+  bottom: 140px;
+  left: 0;
+  right: 0;
   background: ${({ theme }) => theme.colors.bgElev};
   padding: 8px 16px;
-  z-index: 10;
+  z-index: 55;
 `;
 
 const SaveWrap = styled.div`
   position: fixed;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 100%;
-  max-width: 420px;
-  padding: 12px 16px 24px;
+  bottom: 70px;
+  left: 0;
+  right: 0;
+  padding: 12px 16px;
   background: ${({ theme }) => theme.colors.bgElev};
-  z-index: 10;
+  z-index: 55;
 `;
