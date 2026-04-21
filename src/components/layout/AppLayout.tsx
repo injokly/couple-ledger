@@ -67,7 +67,7 @@ export default function AppLayout() {
 }
 
 const Container = styled.div`
-  max-width: 420px;
+  max-width: 100%;
   margin: 0 auto;
   min-height: 100vh;
   position: relative;
@@ -83,7 +83,7 @@ const TabBar = styled.nav`
   left: 50%;
   transform: translateX(-50%);
   width: 100%;
-  max-width: 420px;
+  max-width: 100%;
   background: rgba(10, 11, 14, 0.92);
   backdrop-filter: blur(14px);
   border-top: 1px solid ${({ theme }) => theme.colors.border};
