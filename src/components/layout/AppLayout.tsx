@@ -19,7 +19,7 @@ const TABS = [
   { path: '/settings', label: '설정', icon: '✦' },
 ] as const;
 
-export function AppLayout() {
+export default function AppLayout() {
   const location = useLocation();
   const openQuickInput = useQuickInputStore((s) => s.open);
 
