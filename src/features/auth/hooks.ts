@@ -31,16 +31,21 @@ export function useAuthListener() {
     let mounted = true;
 
     async function init() {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-      if (!mounted) return;
+      try {
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
+        if (!mounted) return;
 
-      if (session) {
-        const member = await fetchCurrentMember();
-        if (mounted) setAuth(session.user.id, member);
-      } else {
-        clear();
+        if (session) {
+          const member = await fetchCurrentMember();
+          if (mounted) setAuth(session.user.id, member);
+        } else {
+          clear();
+        }
+      } catch {
+        // Supabase 연결 실패 시에도 로딩 해제
+        if (mounted) clear();
       }
     }
 
