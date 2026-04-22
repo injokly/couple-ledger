@@ -388,6 +388,27 @@ export type Database = {
           updated_at?: string;
         };
       };
+      report_snapshots: {
+        Relationships: [];
+        Row: {
+          id: string;
+          household_id: string;
+          report_month: string;
+          data: Record<string, unknown>;
+          generated_at: string;
+        };
+        Insert: {
+          id?: string;
+          household_id: string;
+          report_month: string;
+          data: Record<string, unknown>;
+          generated_at?: string;
+        };
+        Update: {
+          data?: Record<string, unknown>;
+          generated_at?: string;
+        };
+      };
       budgets: {
         Relationships: [];
         Row: {

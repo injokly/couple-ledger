@@ -211,6 +211,44 @@ export interface HoldingValued extends Holding {
   unrealizedPnl: number | null;
 }
 
+// ── 리포트 타입 ────────────────────────────────────
+
+export interface Insight {
+  severity: 'good' | 'warn' | 'info';
+  title: string;
+  description: string;
+}
+
+export interface CategoryTotal {
+  categoryId: string;
+  categoryName: string;
+  icon: string | null;
+  total: number;
+}
+
+export interface ReportData {
+  month: string;
+  income: number;
+  expense: number;
+  netFlow: number;
+  savingRate: number;
+  prevIncome: number;
+  prevExpense: number;
+  prevNetFlow: number;
+  categorySpending: CategoryTotal[];
+  prevCategorySpending: CategoryTotal[];
+  budgetProgress: BudgetProgress[];
+  insights: Insight[];
+  netWorth: number | null;
+  prevNetWorth: number | null;
+}
+
+export interface PreviewItem {
+  type: 'holiday' | 'recurring' | 'historical';
+  label: string;
+  detail: string;
+}
+
 // ── 뷰/파생 타입 ────────────────────────────────────
 
 export interface NetWorthPoint {

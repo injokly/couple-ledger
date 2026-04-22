@@ -7,6 +7,7 @@ export default [
     index('routes/_index.tsx'),
     route('transactions', 'routes/transactions._index.tsx'),
     route('transactions/:id', 'routes/transactions.$id.tsx'),
+    route('report', 'routes/report._index.tsx'),
     route('assets', 'routes/assets._index.tsx'),
     route('assets/snapshot/new', 'routes/assets.snapshot.new.tsx'),
     route('settings', 'routes/settings._index.tsx'),
