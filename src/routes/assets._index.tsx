@@ -3,6 +3,7 @@ import { Link } from 'react-router';
 
 import { Button } from '@/components/ui/Button';
 import { useAccounts } from '@/features/accounts/hooks';
+import { useHouseholdMembers } from '@/features/auth/hooks';
 import { useNetWorthSeries } from '@/features/snapshots/hooks';
 import { formatCurrency, formatPercent } from '@/lib/format';
 import { useAuthStore } from '@/stores/auth';
@@ -15,6 +16,7 @@ export default function AssetsPage() {
   const member = useAuthStore((s) => s.member);
   const householdId = member?.householdId;
   const { data: accounts } = useAccounts(householdId);
+  const { data: members } = useHouseholdMembers(householdId);
   const { data: netWorthSeries } = useNetWorthSeries(householdId, '6M');
 
   const latest = netWorthSeries?.[netWorthSeries.length - 1];
@@ -52,17 +54,28 @@ export default function AssetsPage() {
       {accounts && accounts.length > 0 && (
         <Section>
           <SectionTitle>계좌 ({accounts.length})</SectionTitle>
-          {accounts.map((account) => (
-            <AccountRow key={account.id}>
-              <AccountIcon $color={account.color ?? '#3182F6'}>
-                {account.icon ?? '💳'}
-              </AccountIcon>
-              <AccountInfo>
-                <AccountName>{account.name}</AccountName>
-                <AccountMeta>{account.institution ?? account.type}</AccountMeta>
-              </AccountInfo>
-            </AccountRow>
-          ))}
+          {accounts.map((account) => {
+            const ownerName = account.ownerMemberId
+              ? members?.find((m) => m.id === account.ownerMemberId)?.displayName ?? ''
+              : '공동';
+            const ownerColor = account.ownerMemberId
+              ? members?.find((m) => m.id === account.ownerMemberId)?.color ?? '#3182F6'
+              : '#5C5F66';
+            return (
+              <AccountRow key={account.id}>
+                <AccountIcon $color={account.color ?? '#3182F6'}>
+                  {account.icon ?? '💳'}
+                </AccountIcon>
+                <AccountInfo>
+                  <AccountNameRow>
+                    <AccountName>{account.name}</AccountName>
+                    <OwnerTag $color={ownerColor}>{ownerName}</OwnerTag>
+                  </AccountNameRow>
+                  <AccountMeta>{account.institution ?? account.type}</AccountMeta>
+                </AccountInfo>
+              </AccountRow>
+            );
+          })}
         </Section>
       )}
 
@@ -153,6 +166,23 @@ const AccountIcon = styled.span<{ $color: string }>`
 
 const AccountInfo = styled.div`
   flex: 1;
+  min-width: 0;
+`;
+
+const AccountNameRow = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 6px;
+`;
+
+const OwnerTag = styled.span<{ $color: string }>`
+  font-size: ${({ theme }) => theme.typography.fontSize.xs};
+  font-weight: ${({ theme }) => theme.typography.fontWeight.semibold};
+  color: ${({ $color }) => $color};
+  background: ${({ $color }) => $color}1A;
+  padding: 1px 6px;
+  border-radius: ${({ theme }) => theme.radius.sm};
+  flex-shrink: 0;
 `;
 
 const AccountName = styled.span`

@@ -2,7 +2,7 @@ import styled from '@emotion/styled';
 import { useState } from 'react';
 import { Link } from 'react-router';
 
-import type { Account, AccountType } from '@/types/app';
+import type { Account, AccountType, HouseholdMember } from '@/types/app';
 
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
@@ -11,6 +11,7 @@ import {
   updateAccount,
 } from '@/features/accounts/api';
 import { useAccounts } from '@/features/accounts/hooks';
+import { useHouseholdMembers } from '@/features/auth/hooks';
 import { useAuthStore } from '@/stores/auth';
 
 
@@ -42,8 +43,15 @@ export default function AccountsSettingsPage() {
   const [editingAccount, setEditingAccount] = useState<Account | null>(null);
   const [showAddModal, setShowAddModal] = useState(false);
 
+  const { data: members } = useHouseholdMembers(householdId);
   const activeAccounts = (accounts ?? []).filter((a) => !a.isArchived);
   const archivedAccounts = (accounts ?? []).filter((a) => a.isArchived);
+
+  function getOwnerName(ownerMemberId: string | null) {
+    if (!ownerMemberId) return '공동';
+    const m = members?.find((mem) => mem.id === ownerMemberId);
+    return m?.displayName ?? '';
+  }
 
   async function handleArchive(account: Account) {
     await updateAccount(account.id, { isArchived: !account.isArchived });
@@ -66,7 +74,16 @@ export default function AccountsSettingsPage() {
             {account.icon ?? '💳'}
           </AccountIcon>
           <AccountInfo>
-            <AccountName>{account.name}</AccountName>
+            <AccountNameRow>
+              <AccountName>{account.name}</AccountName>
+              <OwnerTag $color={
+                account.ownerMemberId
+                  ? members?.find((m) => m.id === account.ownerMemberId)?.color ?? '#3182F6'
+                  : '#5C5F66'
+              }>
+                {getOwnerName(account.ownerMemberId)}
+              </OwnerTag>
+            </AccountNameRow>
             <AccountMeta>
               {ACCOUNT_TYPES.find((t) => t.value === account.type)?.label}
               {account.institution && ` · ${account.institution}`}
@@ -104,6 +121,7 @@ export default function AccountsSettingsPage() {
           account={editingAccount}
           householdId={householdId!}
           memberId={member?.id}
+          members={members ?? []}
           onClose={() => {
             setShowAddModal(false);
             setEditingAccount(null);
@@ -125,12 +143,14 @@ function AccountFormModal({
   account,
   householdId,
   memberId,
+  members,
   onClose,
   onSaved,
 }: {
   account: Account | null;
   householdId: string;
   memberId: string | undefined;
+  members: HouseholdMember[];
   onClose: () => void;
   onSaved: () => void;
 }) {
@@ -138,6 +158,9 @@ function AccountFormModal({
   const [type, setType] = useState<AccountType>(account?.type ?? 'cash');
   const [institution, setInstitution] = useState(account?.institution ?? '');
   const [color, setColor] = useState(account?.color ?? PRESET_COLORS[1]!);
+  const [ownerMemberId, setOwnerMemberId] = useState<string | null>(
+    account?.ownerMemberId ?? memberId ?? null,
+  );
   const [submitting, setSubmitting] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
@@ -147,7 +170,7 @@ function AccountFormModal({
 
     try {
       if (account) {
-        await updateAccount(account.id, { name, type, institution: institution || null, color });
+        await updateAccount(account.id, { name, type, institution: institution || null, color, ownerMemberId });
       } else {
         await createAccount({
           householdId,
@@ -155,6 +178,7 @@ function AccountFormModal({
           type,
           institution: institution || undefined,
           color,
+          ownerMemberId,
           createdBy: memberId,
         });
       }
@@ -189,6 +213,26 @@ function AccountFormModal({
                 {t.label}
               </TypeChip>
             ))}
+          </TypeGrid>
+          <Label>소유자</Label>
+          <TypeGrid>
+            {members.map((m) => (
+              <TypeChip
+                key={m.id}
+                type="button"
+                $active={ownerMemberId === m.id}
+                onClick={() => setOwnerMemberId(m.id)}
+              >
+                {m.displayName}
+              </TypeChip>
+            ))}
+            <TypeChip
+              type="button"
+              $active={ownerMemberId === null}
+              onClick={() => setOwnerMemberId(null)}
+            >
+              공동
+            </TypeChip>
           </TypeGrid>
           <Input
             id="institution"
@@ -269,6 +313,22 @@ const AccountIcon = styled.span<{ $color: string }>`
 const AccountInfo = styled.div`
   flex: 1;
   min-width: 0;
+`;
+
+const AccountNameRow = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 6px;
+`;
+
+const OwnerTag = styled.span<{ $color: string }>`
+  font-size: ${({ theme }) => theme.typography.fontSize.xs};
+  font-weight: ${({ theme }) => theme.typography.fontWeight.semibold};
+  color: ${({ $color }) => $color};
+  background: ${({ $color }) => $color}1A;
+  padding: 1px 6px;
+  border-radius: ${({ theme }) => theme.radius.sm};
+  flex-shrink: 0;
 `;
 
 const AccountName = styled.span<{ $archived?: boolean }>`

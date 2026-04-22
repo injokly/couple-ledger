@@ -14,6 +14,7 @@ function toAccount(row: Record<string, unknown>): Account {
     color: (row.color as string) ?? null,
     displayOrder: row.display_order as number,
     isArchived: row.is_archived as boolean,
+    ownerMemberId: (row.owner_member_id as string) ?? null,
     createdBy: (row.created_by as string) ?? null,
     createdAt: row.created_at as string,
     updatedAt: row.updated_at as string,
@@ -47,6 +48,7 @@ export interface CreateAccountInput {
   currency?: string;
   icon?: string;
   color?: string;
+  ownerMemberId?: string | null;
   createdBy?: string;
 }
 
@@ -61,6 +63,7 @@ export async function createAccount(input: CreateAccountInput): Promise<Account>
       currency: input.currency ?? 'KRW',
       icon: input.icon ?? null,
       color: input.color ?? null,
+      owner_member_id: input.ownerMemberId ?? null,
       created_by: input.createdBy ?? null,
     })
     .select()
@@ -76,6 +79,7 @@ export interface UpdateAccountInput {
   institution?: string | null;
   icon?: string | null;
   color?: string | null;
+  ownerMemberId?: string | null;
   isArchived?: boolean;
 }
 
@@ -91,6 +95,7 @@ export async function updateAccount(
       ...(input.institution !== undefined && { institution: input.institution }),
       ...(input.icon !== undefined && { icon: input.icon }),
       ...(input.color !== undefined && { color: input.color }),
+      ...(input.ownerMemberId !== undefined && { owner_member_id: input.ownerMemberId }),
       ...(input.isArchived !== undefined && { is_archived: input.isArchived }),
     })
     .eq('id', id)

@@ -32,3 +32,4 @@ playwright/.cache/
 # Supabase
 supabase/.branches/
 supabase/.temp/
+supabase/seed.sql
