@@ -55,6 +55,7 @@ export interface Account {
   color: string | null;
   displayOrder: number;
   isArchived: boolean;
+  ownerMemberId: string | null;
   createdBy: string | null;
   createdAt: string;
   updatedAt: string;
@@ -134,6 +135,29 @@ export interface Goal {
   createdBy: string | null;
   createdAt: string;
   updatedAt: string;
+}
+
+export type RecurringFrequency = 'daily' | 'weekly' | 'monthly' | 'yearly';
+
+export interface RecurringTemplate {
+  id: string;
+  householdId: string;
+  name: string;
+  type: TransactionType;
+  amount: number;
+  currency: string;
+  accountId: string;
+  toAccountId: string | null;
+  categoryId: string | null;
+  frequency: RecurringFrequency;
+  intervalN: number;
+  dayOfMonth: number | null;
+  dayOfWeek: number | null;
+  nextRunDate: string;
+  autoCreate: boolean;
+  isActive: boolean;
+  createdBy: string | null;
+  createdAt: string;
 }
 
 // ── 뷰/파생 타입 ────────────────────────────────────

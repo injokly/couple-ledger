@@ -25,4 +25,9 @@ export const cacheKey = {
 
   snapshots: (householdId: string, date: string) =>
     ['snapshots', householdId, date] as const,
+
+  recurring: (householdId: string) => ['recurring', householdId] as const,
+
+  pendingReminders: (householdId: string) =>
+    ['recurring-reminders', householdId] as const,
 };

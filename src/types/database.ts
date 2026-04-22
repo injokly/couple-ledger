@@ -98,6 +98,7 @@ export type Database = {
           color: string | null;
           display_order: number;
           is_archived: boolean;
+          owner_member_id: string | null;
           created_by: string | null;
           created_at: string;
           updated_at: string;
@@ -113,6 +114,7 @@ export type Database = {
           color?: string | null;
           display_order?: number;
           is_archived?: boolean;
+          owner_member_id?: string | null;
           created_by?: string | null;
           created_at?: string;
           updated_at?: string;
@@ -126,6 +128,7 @@ export type Database = {
           color?: string | null;
           display_order?: number;
           is_archived?: boolean;
+          owner_member_id?: string | null;
           updated_at?: string;
         };
       };
@@ -243,6 +246,7 @@ export type Database = {
           amount: number;
           currency?: string;
           account_id: string;
+          to_account_id?: string | null;
           category_id?: string | null;
           frequency: string;
           interval_n?: number;
@@ -256,9 +260,18 @@ export type Database = {
         };
         Update: {
           name?: string;
+          type?: string;
           amount?: number;
+          currency?: string;
+          account_id?: string;
+          to_account_id?: string | null;
+          category_id?: string | null;
           frequency?: string;
+          interval_n?: number;
+          day_of_month?: number | null;
+          day_of_week?: number | null;
           next_run_date?: string;
+          auto_create?: boolean;
           is_active?: boolean;
         };
       };
@@ -449,6 +462,14 @@ export type Database = {
       };
       seed_default_categories: {
         Args: { p_household_id: string };
+        Returns: void;
+      };
+      process_recurring_transactions: {
+        Args: Record<string, never>;
+        Returns: number;
+      };
+      skip_recurring_template: {
+        Args: { p_template_id: string };
         Returns: void;
       };
     };

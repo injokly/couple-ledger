@@ -12,9 +12,12 @@ import {
 
 import type { NetWorthPoint } from '@/types/app';
 
+import { Button } from '@/components/ui/Button';
 import { Card, CardHead, CardTitle, CardSubtitle } from '@/components/ui/Card';
 import { useAssetBreakdown, useMonthlyFlow } from '@/features/networth/hooks';
+import { usePendingReminders } from '@/features/recurring/hooks';
 import { useNetWorthSeries, useSnapshotReminder } from '@/features/snapshots/hooks';
+import { useCreateTransaction } from '@/features/transactions/hooks';
 import { formatCompact, formatCurrency, formatPercent } from '@/lib/format';
 import { useAuthStore } from '@/stores/auth';
 
@@ -34,6 +37,8 @@ export default function HomePage() {
   const { data: monthlyFlow } = useMonthlyFlow(householdId);
   const { data: showReminder } = useSnapshotReminder(householdId);
   const { data: assetBreakdown } = useAssetBreakdown(householdId);
+  const { data: pendingReminders, mutate: mutateReminders } = usePendingReminders(householdId);
+  const createTx = useCreateTransaction();
 
   const now = new Date();
   const days = ['일', '월', '화', '수', '목', '금', '토'];
@@ -162,6 +167,38 @@ export default function HomePage() {
           <span>목표 {savingsTarget}.0%</span>
         </SavingsInfo>
       </Card>
+
+      {/* 반복 거래 알림 */}
+      {pendingReminders && pendingReminders.length > 0 && pendingReminders.map((r) => (
+        <RecurringReminderCard key={r.id}>
+          <ReminderContent>
+            <strong>{r.name}</strong> {formatCurrency(r.amount)}
+            <br />
+            <ReminderSub>{r.nextRunDate} 예정</ReminderSub>
+          </ReminderContent>
+          <Button
+            size="sm"
+            onClick={async () => {
+              if (!member) return;
+              await createTx({
+                householdId: member.householdId,
+                type: r.type,
+                amount: r.amount,
+                currency: r.currency,
+                transactionDate: r.nextRunDate,
+                accountId: r.accountId,
+                toAccountId: r.toAccountId ?? undefined,
+                categoryId: r.categoryId ?? undefined,
+                memo: r.name,
+                createdBy: member.id,
+              });
+              await mutateReminders();
+            }}
+          >
+            기록하기
+          </Button>
+        </RecurringReminderCard>
+      ))}
 
       {/* 스냅샷 리마인더 */}
       {showReminder && (
@@ -399,6 +436,34 @@ const AssetPercent = styled.span`
   font-size: ${({ theme }) => theme.typography.fontSize.md};
   font-weight: ${({ theme }) => theme.typography.fontWeight.semibold};
   font-variant-numeric: tabular-nums;
+  color: ${({ theme }) => theme.colors.text3};
+`;
+
+const RecurringReminderCard = styled.div`
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0 14px 10px;
+  padding: 16px 20px;
+  background: linear-gradient(135deg, rgba(28, 181, 114, 0.12) 0%, rgba(28, 181, 114, 0.04) 100%);
+  border: 1px solid rgba(28, 181, 114, 0.2);
+  border-radius: ${({ theme }) => theme.radius['2xl']};
+`;
+
+const ReminderContent = styled.span`
+  font-size: ${({ theme }) => theme.typography.fontSize.base};
+  color: ${({ theme }) => theme.colors.text2};
+  line-height: 1.5;
+
+  strong {
+    color: ${({ theme }) => theme.colors.text};
+    font-weight: ${({ theme }) => theme.typography.fontWeight.semibold};
+  }
+`;
+
+const ReminderSub = styled.span`
+  font-size: ${({ theme }) => theme.typography.fontSize.sm};
   color: ${({ theme }) => theme.colors.text3};
 `;
 

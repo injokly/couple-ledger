@@ -31,6 +31,7 @@ export default function SettingsPage() {
         <MenuLink to="/settings/household">가정 멤버 관리</MenuLink>
         <MenuLink to="/settings/accounts">계좌 관리</MenuLink>
         <MenuLink to="/settings/categories">카테고리 관리</MenuLink>
+        <MenuLink to="/settings/recurring">반복 거래</MenuLink>
       </Section>
 
       <LogoutButton type="button" onClick={handleSignOut}>

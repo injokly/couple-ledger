@@ -12,6 +12,7 @@ export default [
     route('settings', 'routes/settings._index.tsx'),
     route('settings/accounts', 'routes/settings.accounts.tsx'),
     route('settings/categories', 'routes/settings.categories.tsx'),
+    route('settings/recurring', 'routes/settings.recurring.tsx'),
     route('settings/household', 'routes/settings.household.tsx'),
   ]),
   // 인증 라우트는 레이아웃(탭바) 밖
