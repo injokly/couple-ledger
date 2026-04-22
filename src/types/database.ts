@@ -359,6 +359,9 @@ export type Database = {
           linked_account_ids: string[];
           priority: number;
           status: string;
+          monthly_contribution: number | null;
+          expected_return_pct: number | null;
+          simulation_type: string;
           created_by: string | null;
           created_at: string;
           updated_at: string;
@@ -373,6 +376,9 @@ export type Database = {
           linked_account_ids?: string[];
           priority?: number;
           status?: string;
+          monthly_contribution?: number | null;
+          expected_return_pct?: number | null;
+          simulation_type?: string;
           created_by?: string | null;
           created_at?: string;
           updated_at?: string;
@@ -385,6 +391,9 @@ export type Database = {
           linked_account_ids?: string[];
           priority?: number;
           status?: string;
+          monthly_contribution?: number | null;
+          expected_return_pct?: number | null;
+          simulation_type?: string;
           updated_at?: string;
         };
       };

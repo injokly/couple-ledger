@@ -40,4 +40,6 @@ export const cacheKey = {
 
   budgetProgress: (householdId: string) =>
     ['budget-progress', householdId] as const,
+
+  goals: (householdId: string) => ['goals', householdId] as const,
 };

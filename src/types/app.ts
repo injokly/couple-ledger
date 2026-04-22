@@ -122,6 +122,8 @@ export interface Holding {
   updatedAt: string;
 }
 
+export type SimulationType = 'simple' | 'monte_carlo';
+
 export interface Goal {
   id: string;
   householdId: string;
@@ -132,6 +134,9 @@ export interface Goal {
   linkedAccountIds: string[];
   priority: number;
   status: 'active' | 'achieved' | 'paused';
+  monthlyContribution: number | null;
+  expectedReturnPct: number | null;
+  simulationType: SimulationType;
   createdBy: string | null;
   createdAt: string;
   updatedAt: string;
