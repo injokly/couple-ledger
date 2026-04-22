@@ -113,7 +113,7 @@ export default [
     },
   },
   {
-    ignores: ['build/', '.react-router/', 'node_modules/', 'dist/', 'coverage/'],
+    ignores: ['build/', '.react-router/', 'node_modules/', 'dist/', 'coverage/', 'supabase/functions/'],
   },
   prettierConfig,
 ];

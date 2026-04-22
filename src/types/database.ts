@@ -388,6 +388,34 @@ export type Database = {
           updated_at?: string;
         };
       };
+      market_data: {
+        Relationships: [];
+        Row: {
+          id: string;
+          symbol: string;
+          market: string;
+          price_date: string;
+          close_price: number;
+          currency: string;
+          source: string;
+          fetched_at: string;
+        };
+        Insert: {
+          id?: string;
+          symbol: string;
+          market: string;
+          price_date: string;
+          close_price: number;
+          currency?: string;
+          source: string;
+          fetched_at?: string;
+        };
+        Update: {
+          close_price?: number;
+          source?: string;
+          fetched_at?: string;
+        };
+      };
     };
     Views: {
       v_household_networth_by_date: {
@@ -448,6 +476,37 @@ export type Database = {
           category: string;
           value_krw: number;
           account_count: number;
+        };
+      };
+      v_holdings_valued: {
+        Relationships: [];
+        Row: {
+          id: string;
+          household_id: string;
+          account_id: string;
+          symbol: string;
+          market: string | null;
+          name: string;
+          asset_class: string;
+          quantity: number;
+          avg_cost: number | null;
+          currency: string;
+          updated_at: string;
+          close_price: number | null;
+          price_date: string | null;
+          price_source: string | null;
+          market_value: number | null;
+          value_krw: number | null;
+          unrealized_pnl: number | null;
+        };
+      };
+      v_latest_exchange_rate: {
+        Relationships: [];
+        Row: {
+          from_ccy: string;
+          to_ccy: string;
+          rate: number;
+          price_date: string;
         };
       };
     };

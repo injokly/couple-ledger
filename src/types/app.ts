@@ -160,6 +160,26 @@ export interface RecurringTemplate {
   createdAt: string;
 }
 
+export interface MarketData {
+  id: string;
+  symbol: string;
+  market: string;
+  priceDate: string;
+  closePrice: number;
+  currency: string;
+  source: string;
+  fetchedAt: string;
+}
+
+export interface HoldingValued extends Holding {
+  closePrice: number | null;
+  priceDate: string | null;
+  priceSource: string | null;
+  marketValue: number | null;
+  valueKrw: number | null;
+  unrealizedPnl: number | null;
+}
+
 // ── 뷰/파생 타입 ────────────────────────────────────
 
 export interface NetWorthPoint {
