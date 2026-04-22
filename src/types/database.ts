@@ -388,6 +388,38 @@ export type Database = {
           updated_at?: string;
         };
       };
+      budgets: {
+        Relationships: [];
+        Row: {
+          id: string;
+          household_id: string;
+          category_id: string;
+          amount: number;
+          period: string;
+          currency: string;
+          start_date: string;
+          is_active: boolean;
+          created_by: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          household_id: string;
+          category_id: string;
+          amount: number;
+          period?: string;
+          currency?: string;
+          start_date?: string;
+          is_active?: boolean;
+          created_by?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          amount?: number;
+          period?: string;
+          is_active?: boolean;
+        };
+      };
       market_data: {
         Relationships: [];
         Row: {
@@ -476,6 +508,22 @@ export type Database = {
           category: string;
           value_krw: number;
           account_count: number;
+        };
+      };
+      v_budget_progress: {
+        Relationships: [];
+        Row: {
+          budget_id: string;
+          household_id: string;
+          category_id: string;
+          category_name: string;
+          icon: string | null;
+          color: string | null;
+          budget_amount: number;
+          currency: string;
+          spent: number;
+          progress: number;
+          status: string;
         };
       };
       v_holdings_valued: {

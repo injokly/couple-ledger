@@ -14,6 +14,7 @@ import type { NetWorthPoint } from '@/types/app';
 
 import { Button } from '@/components/ui/Button';
 import { Card, CardHead, CardTitle, CardSubtitle } from '@/components/ui/Card';
+import { useBudgetProgress } from '@/features/budgets/hooks';
 import { useAssetBreakdown, useMonthlyFlow } from '@/features/networth/hooks';
 import { usePendingReminders } from '@/features/recurring/hooks';
 import { useNetWorthSeries, useSnapshotReminder } from '@/features/snapshots/hooks';
@@ -38,6 +39,7 @@ export default function HomePage() {
   const { data: showReminder } = useSnapshotReminder(householdId);
   const { data: assetBreakdown } = useAssetBreakdown(householdId);
   const { data: pendingReminders, mutate: mutateReminders } = usePendingReminders(householdId);
+  const { data: budgetProgress } = useBudgetProgress(householdId);
   const createTx = useCreateTransaction();
 
   const now = new Date();
@@ -167,6 +169,48 @@ export default function HomePage() {
           <span>목표 {savingsTarget}.0%</span>
         </SavingsInfo>
       </Card>
+
+      {/* 예산 알림 배너 */}
+      {budgetProgress && budgetProgress.filter((b) => b.progress >= 0.8).map((b) => (
+        <AlertBanner key={b.budgetId} $variant={b.progress >= 1.0 ? 'danger' : 'warn'}>
+          이번 달 {b.categoryName}
+          {b.progress >= 1.0
+            ? ` 예산을 ${((b.progress - 1) * 100).toFixed(0)}% 초과했어요`
+            : ` 예산이 ${(b.progress * 100).toFixed(0)}%에 도달했어요`}
+        </AlertBanner>
+      ))}
+
+      {/* 예산 요약 카드 */}
+      {budgetProgress && budgetProgress.length > 0 && (
+        <Card>
+          <CardHead>
+            <CardTitle>예산 현황</CardTitle>
+            <CardSubtitle>{budgetProgress.length}개 설정</CardSubtitle>
+          </CardHead>
+          {budgetProgress.slice(0, 4).map((bp) => (
+            <BudgetRow key={bp.budgetId}>
+              <BudgetLabel>
+                {bp.icon && <span>{bp.icon}</span>} {bp.categoryName}
+              </BudgetLabel>
+              <BudgetBarWrap>
+                <BudgetBar>
+                  <BudgetBarFill
+                    $width={Math.min(bp.progress * 100, 100)}
+                    $variant={bp.progress >= 1.0 ? 'danger' : bp.progress >= 0.95 ? 'warn' : 'ok'}
+                  />
+                </BudgetBar>
+                <BudgetPct $variant={bp.progress >= 1.0 ? 'danger' : bp.progress >= 0.95 ? 'warn' : 'ok'}>
+                  {(bp.progress * 100).toFixed(0)}%
+                  {bp.progress >= 1.0 ? ' 초과' : ''}
+                </BudgetPct>
+              </BudgetBarWrap>
+            </BudgetRow>
+          ))}
+          {budgetProgress.length > 4 && (
+            <ViewAllLink to="/settings/budgets">전체 보기 →</ViewAllLink>
+          )}
+        </Card>
+      )}
 
       {/* 반복 거래 알림 */}
       {pendingReminders && pendingReminders.length > 0 && pendingReminders.map((r) => (
@@ -437,6 +481,76 @@ const AssetPercent = styled.span`
   font-weight: ${({ theme }) => theme.typography.fontWeight.semibold};
   font-variant-numeric: tabular-nums;
   color: ${({ theme }) => theme.colors.text3};
+`;
+
+const AlertBanner = styled.div<{ $variant: 'warn' | 'danger' }>`
+  margin: 0 14px 8px;
+  padding: 12px 16px;
+  border-radius: ${({ theme }) => theme.radius.lg};
+  font-size: ${({ theme }) => theme.typography.fontSize.md};
+  font-weight: ${({ theme }) => theme.typography.fontWeight.medium};
+  background: ${({ theme, $variant }) =>
+    $variant === 'danger' ? theme.colors.dangerSoft : theme.colors.warnSoft};
+  color: ${({ theme, $variant }) =>
+    $variant === 'danger' ? theme.colors.danger : theme.colors.warn};
+`;
+
+const BudgetRow = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 0;
+  gap: 12px;
+`;
+
+const BudgetLabel = styled.span`
+  font-size: ${({ theme }) => theme.typography.fontSize.md};
+  color: ${({ theme }) => theme.colors.text2};
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  min-width: 80px;
+`;
+
+const BudgetBarWrap = styled.div`
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+`;
+
+const BudgetBar = styled.div`
+  flex: 1;
+  height: 8px;
+  background: ${({ theme }) => theme.colors.bgChip};
+  border-radius: 4px;
+  overflow: hidden;
+`;
+
+const BudgetBarFill = styled.div<{ $width: number; $variant: string }>`
+  height: 100%;
+  width: ${({ $width }) => $width}%;
+  border-radius: 4px;
+  transition: width 0.3s;
+  background: ${({ theme, $variant }) => {
+    if ($variant === 'danger') return theme.colors.danger;
+    if ($variant === 'warn') return theme.colors.warn;
+    return theme.colors.success;
+  }};
+`;
+
+const BudgetPct = styled.span<{ $variant: string }>`
+  font-size: ${({ theme }) => theme.typography.fontSize.sm};
+  font-weight: ${({ theme }) => theme.typography.fontWeight.semibold};
+  font-variant-numeric: tabular-nums;
+  min-width: 48px;
+  text-align: right;
+  color: ${({ theme, $variant }) => {
+    if ($variant === 'danger') return theme.colors.danger;
+    if ($variant === 'warn') return theme.colors.warn;
+    return theme.colors.success;
+  }};
 `;
 
 const RecurringReminderCard = styled.div`

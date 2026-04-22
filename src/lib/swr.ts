@@ -35,4 +35,9 @@ export const cacheKey = {
 
   holdingsValued: (householdId: string) =>
     ['holdings-valued', householdId] as const,
+
+  budgets: (householdId: string) => ['budgets', householdId] as const,
+
+  budgetProgress: (householdId: string) =>
+    ['budget-progress', householdId] as const,
 };

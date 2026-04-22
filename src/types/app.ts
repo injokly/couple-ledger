@@ -160,6 +160,37 @@ export interface RecurringTemplate {
   createdAt: string;
 }
 
+export type BudgetPeriod = 'monthly' | 'yearly';
+
+export interface Budget {
+  id: string;
+  householdId: string;
+  categoryId: string;
+  amount: number;
+  period: BudgetPeriod;
+  currency: string;
+  startDate: string;
+  isActive: boolean;
+  createdBy: string | null;
+  createdAt: string;
+}
+
+export type BudgetStatus = 'ok' | 'warn' | 'over';
+
+export interface BudgetProgress {
+  budgetId: string;
+  householdId: string;
+  categoryId: string;
+  categoryName: string;
+  icon: string | null;
+  color: string | null;
+  budgetAmount: number;
+  currency: string;
+  spent: number;
+  progress: number;
+  status: BudgetStatus;
+}
+
 export interface MarketData {
   id: string;
   symbol: string;
